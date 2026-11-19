@@ -1,0 +1,660 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1F4D3A"><link rel="icon" href="icon.png"><link rel="apple-touch-icon" href="icon.png">
+<title>Homely App Demo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: an iPhone running the Homely app, centered, with demo controls above it. iOS light appearance, Homely green as the app tint. */
+:root{
+  --brand:#1F4D3A; --tint:#2B6B4F; --sand:#EFE6D6; --tan:#C9A87C;
+  --label:#000000; --label2:rgba(60,60,67,.6); --label3:rgba(60,60,67,.3);
+  --sep:rgba(60,60,67,.18); --bg:#F2F2F7; --cell:#FFFFFF; --fill:rgba(118,118,128,.12);
+  --red:#FF3B30; --orange:#C26A00; --orange-bg:#FFF3E0; --bubble:#E9E9EB;
+  --font:-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", "Helvetica Neue", Arial, sans-serif;
+  color-scheme: light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--brand);font-family:var(--font);color:var(--label);-webkit-font-smoothing:antialiased;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:16px;
+  display:flex;flex-direction:column;align-items:center;gap:12px}
+button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--tan);outline-offset:2px}
+
+/* demo controls outside the phone */
+.caption{color:var(--sand);text-align:center;max-width:410px;display:flex;flex-direction:column;gap:3px}
+.caption b{font-size:22px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:9px}
+.appicon{width:34px;height:34px;border-radius:8px;background:var(--sand);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.appicon svg{width:26px;height:26px}
+.brandhead{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.brandhead svg{width:34px;height:34px}
+.brandhead span{font-size:30px;font-weight:800;color:var(--brand);letter-spacing:-.01em}
+.caption span{font-size:13px;opacity:.8}
+.mode{display:flex;padding:3px;background:rgba(0,0,0,.2);border-radius:11px;width:100%;max-width:410px}
+.mode button{flex:1;border:0;background:transparent;color:var(--sand);padding:8px;border-radius:9px;font-weight:600;font-size:14px}
+.mode button[aria-pressed="true"]{background:var(--sand);color:var(--brand)}
+.demo-note{color:var(--sand);opacity:.7;font-size:12px;text-align:center;max-width:410px}
+
+/* device */
+.device{width:100%;max-width:410px;height:min(860px, calc(100dvh - 150px));min-height:660px;background:#111;border-radius:58px;padding:11px;
+  box-shadow:0 0 0 2px #3a3a3c, 0 30px 70px rgba(0,0,0,.45);flex:none}
+.screen{position:relative;width:100%;height:100%;background:var(--bg);border-radius:47px;overflow:hidden;display:flex;flex-direction:column}
+.status{height:50px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:6px 30px 0 34px;font-weight:600;font-size:16px;position:relative;z-index:6}
+.status .icons{display:flex;gap:6px;align-items:center}
+.status svg{height:12px}
+.island{position:absolute;top:11px;left:50%;transform:translateX(-50%);width:120px;height:35px;background:#000;border-radius:20px}
+.homebar{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#000;z-index:30;pointer-events:none}
+@media (max-width:440px){
+  .device{padding:0;background:none;box-shadow:none;border-radius:0;height:calc(100dvh - 130px);min-height:600px}
+  .screen{border-radius:28px}
+  .island,.homebar{display:none}
+  .status{display:none}
+}
+
+/* screens */
+.main{position:relative;flex:1;min-height:0}
+.scr{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg)}
+.scroll{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden}
+.push{animation:push .32s cubic-bezier(.2,.8,.2,1)}
+@keyframes push{from{transform:translateX(100%)}to{transform:none}}
+.lt{display:flex;align-items:flex-end;justify-content:space-between;padding:6px 18px 8px}
+.lt h1{font-size:34px;font-weight:700;letter-spacing:.012em;margin:0;line-height:1.15}
+.pill{border:0;border-radius:99px;padding:6px 12px;font-size:13px;font-weight:600;background:var(--fill);color:var(--tint);display:flex;align-items:center;gap:5px;margin-bottom:6px}
+.pill.on{background:var(--brand);color:#fff}
+.pill svg{width:13px;height:13px}
+
+/* tab bar */
+.tabbar{flex:none;height:84px;background:rgba(249,249,249,.94);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:.5px solid var(--sep);display:flex;padding-top:6px}
+.tabbar button{flex:1;border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;color:#999;font-size:10px;font-weight:500;position:relative}
+.tabbar button[aria-selected="true"]{color:var(--tint)}
+.tabbar svg{width:27px;height:27px}
+.badge{position:absolute;top:-2px;left:calc(50% + 6px);min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--red);color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center}
+@media (max-width:440px){.tabbar{height:64px}}
+
+/* discover */
+.deck{position:relative;flex:1;margin:2px 16px 0;min-height:0}
+.card{position:absolute;inset:0;background:var(--cell);border-radius:22px;box-shadow:0 8px 24px rgba(0,0,0,.10);display:flex;flex-direction:column;overflow:hidden;touch-action:none;user-select:none;will-change:transform}
+.card.back{transform:scale(.95) translateY(10px)}
+.card.anim{transition:transform .32s ease, opacity .32s ease}
+.photo{flex:1;min-height:110px;position:relative;display:flex;align-items:center;justify-content:center}
+.avatar{width:108px;height:108px;border-radius:50%;background:rgba(255,255,255,.55);display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:700;color:var(--brand);letter-spacing:.01em}
+.vbadge{position:absolute;top:12px;left:12px;display:flex;align-items:center;gap:4px;background:var(--brand);color:#fff;font-size:12px;font-weight:600;padding:5px 9px;border-radius:99px}
+.vbadge svg{width:13px;height:13px}
+.avail{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.9);font-size:12px;font-weight:600;padding:5px 9px;border-radius:99px}
+.stamp{position:absolute;top:54px;font-weight:800;font-size:28px;padding:3px 11px;border:4px solid;border-radius:10px;opacity:0;letter-spacing:.06em}
+.stamp.like{left:16px;color:var(--tint);transform:rotate(-14deg)}
+.stamp.nope{right:16px;color:var(--red);transform:rotate(14deg)}
+.info{padding:12px 16px 14px;display:flex;flex-direction:column;gap:7px}
+.name{font-size:22px;font-weight:700;line-height:1.15}
+.name small{font-weight:400;font-size:20px;color:var(--label2)}
+.meta{color:var(--label2);font-size:14px}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{font-size:12px;font-weight:500;padding:4px 9px;border-radius:99px;background:var(--fill)}
+.bio{font-size:13.5px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.checks{display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--tint);font-weight:600;padding-top:7px;border-top:.5px solid var(--sep)}
+.checks span{display:flex;align-items:center;gap:3px}
+.checks svg{width:12px;height:12px}
+.actions{display:flex;justify-content:center;align-items:center;gap:22px;padding:12px 0 4px}
+.round{width:58px;height:58px;border-radius:50%;border:0;display:flex;align-items:center;justify-content:center;background:#fff;box-shadow:0 4px 12px rgba(0,0,0,.12)}
+.round svg{width:24px;height:24px}
+.round.no{color:var(--red)}
+.round.yes{background:var(--tint);color:#fff;width:66px;height:66px}
+.round:disabled{opacity:.4;cursor:default}
+.left{font-size:12px;color:var(--label2);text-align:center;padding:4px 0 8px}
+.empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px;padding:24px;color:var(--label2)}
+.empty h3{color:var(--label);font-size:20px;margin:0}
+.empty p{margin:0;font-size:15px}
+
+/* grouped lists */
+.sec{font-size:13px;color:var(--label2);text-transform:uppercase;letter-spacing:.02em;padding:18px 34px 7px}
+.foot{font-size:13px;color:var(--label2);padding:7px 34px 0;line-height:1.35}
+.group{margin:0 16px;background:var(--cell);border-radius:12px;overflow:hidden}
+.cellr{display:flex;align-items:center;gap:12px;padding:10px 16px;min-height:44px;position:relative;width:100%;border:0;background:var(--cell);text-align:left;font-size:17px;color:var(--label)}
+.cellr+.cellr::before{content:"";position:absolute;top:0;right:0;left:var(--inset,16px);border-top:.5px solid var(--sep)}
+button.cellr:active{background:#E5E5EA}
+.av{width:46px;height:46px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--brand);font-size:17px}
+.av.sm{width:34px;height:34px;font-size:13px}
+.ct{flex:1;min-width:0}
+.ct b{display:block;font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ct span{display:block;font-size:14px;color:var(--label2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ct span.unread{color:var(--label);font-weight:500}
+.time{font-size:14px;color:var(--label2);align-self:flex-start;padding-top:2px;display:flex;align-items:center;gap:4px}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--tint);flex:none}
+.chev{color:var(--label3);flex:none}
+.chev svg{width:8px;height:14px;display:block}
+.tag{font-size:12px;font-weight:600;padding:4px 9px;border-radius:99px;flex:none}
+.tag.ok{background:#E3F1E9;color:var(--tint)}
+.tag.paused{background:var(--orange-bg);color:var(--orange)}
+.get{border:0;background:var(--fill);color:var(--tint);font-weight:700;font-size:14px;padding:6px 16px;border-radius:99px;flex:none;min-width:72px}
+.get.done{background:transparent;color:var(--label2)}
+.logo{width:46px;height:46px;border-radius:11px;flex:none;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:#fff}
+
+/* chat */
+.nav{flex:none;display:flex;align-items:center;gap:6px;padding:4px 10px 8px;background:rgba(249,249,249,.94);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:.5px solid var(--sep)}
+.back{border:0;background:none;color:var(--tint);font-size:17px;display:flex;align-items:center;gap:2px;padding:6px 4px;flex:none}
+.back svg{width:12px;height:20px}
+.who{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
+.who .nm{font-size:12px;font-weight:500;display:flex;align-items:center;gap:3px}
+.who .vf{font-size:11px;color:var(--tint);font-weight:600}
+.more{border:0;background:var(--fill);color:var(--tint);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none}
+.more svg{width:18px;height:18px}
+.strip{flex:none;display:flex;align-items:center;gap:10px;padding:9px 14px;background:var(--cell);border-bottom:.5px solid var(--sep);font-size:13px;color:var(--label2)}
+.strip span{flex:1;line-height:1.3}
+.strip.paused{background:var(--orange-bg);color:var(--orange)}
+.strip.hired{color:var(--tint);font-weight:600}
+.sbtn{border:0;background:var(--tint);color:#fff;font-weight:600;font-size:14px;padding:6px 14px;border-radius:99px;flex:none}
+.sbtn.red{background:transparent;color:var(--red);padding:6px 4px}
+.thread{flex:1;min-height:0;overflow-y:auto;padding:12px 12px 8px;display:flex;flex-direction:column;gap:3px}
+.sys{align-self:center;text-align:center;font-size:11.5px;color:var(--label2);padding:10px 20px 6px;line-height:1.35}
+.sys b{font-weight:600}
+.bub{max-width:76%;padding:8px 13px;border-radius:19px;font-size:16px;line-height:1.3;word-wrap:break-word}
+.bub.me{align-self:flex-end;background:var(--tint);color:#fff;border-bottom-right-radius:6px}
+.bub.them{align-self:flex-start;background:var(--bubble);color:var(--label);border-bottom-left-radius:6px}
+.bub.me+.bub.them,.bub.them+.bub.me{margin-top:8px}
+.read{align-self:flex-end;font-size:11px;color:var(--label2);padding:2px 4px 0}
+.typing{align-self:flex-start;background:var(--bubble);border-radius:19px;padding:12px 14px;display:flex;gap:4px;margin-top:8px}
+.typing i{width:8px;height:8px;border-radius:50%;background:#8E8E93;animation:blink 1.2s infinite}
+.typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,60%,100%{opacity:.3}30%{opacity:1}}
+.quick{flex:none;display:flex;gap:6px;overflow-x:auto;padding:6px 12px 2px;scrollbar-width:none}
+.quick::-webkit-scrollbar{display:none}
+.quick button{flex:none;border:1px solid var(--sep);background:var(--cell);color:var(--tint);font-size:14px;padding:7px 12px;border-radius:99px;white-space:nowrap}
+.composer{flex:none;display:flex;align-items:flex-end;gap:8px;padding:8px 12px 30px;background:var(--bg)}
+@media (max-width:440px){.composer{padding-bottom:12px}}
+.plus{width:34px;height:34px;border-radius:50%;border:0;background:var(--fill);color:#8E8E93;display:flex;align-items:center;justify-content:center;flex:none}
+.plus svg{width:16px;height:16px}
+.field{flex:1;display:flex;align-items:center;border:1px solid #D1D1D6;border-radius:19px;background:#fff;padding:3px 3px 3px 14px;min-width:0}
+.field input{flex:1;border:0;outline:0;font:inherit;font-size:16px;padding:5px 0;background:transparent;min-width:0}
+.send{width:30px;height:30px;border-radius:50%;border:0;background:var(--tint);color:#fff;display:flex;align-items:center;justify-content:center;flex:none}
+.send:disabled{background:#C7C7CC}
+.send svg{width:16px;height:16px}
+.composer.off{opacity:.5;pointer-events:none}
+
+/* sheets */
+.dim{position:absolute;inset:0;background:rgba(0,0,0,.35);z-index:20;display:flex;flex-direction:column;justify-content:flex-end;animation:fade .2s}
+@keyframes fade{from{opacity:0}}
+.sheet{background:var(--bg);border-radius:14px 14px 0 0;padding:8px 16px 34px;display:flex;flex-direction:column;gap:12px;animation:up .3s cubic-bezier(.2,.8,.2,1);max-height:92%;overflow:auto}
+@keyframes up{from{transform:translateY(100%)}}
+.grab{width:36px;height:5px;border-radius:3px;background:#C7C7CC;align-self:center}
+.sheet h3{font-size:22px;font-weight:700;margin:4px 0 0;text-align:center}
+.sheet p{margin:0;font-size:15px;color:var(--label2);text-align:center;line-height:1.4}
+.price{text-align:center;font-size:34px;font-weight:700;color:var(--brand)}
+.price small{font-size:15px;font-weight:500;color:var(--label2)}
+.sheet .group{margin:0}
+.big{border:0;width:100%;height:50px;border-radius:14px;font-size:17px;font-weight:600;background:var(--tint);color:#fff}
+.big.plain{background:transparent;color:var(--tint)}
+.big.red{background:var(--red)}
+.big:disabled{opacity:.4;cursor:default}
+.fine{font-size:12px;color:var(--label2);text-align:center}
+.feat{display:flex;gap:10px;align-items:center;font-size:16px}
+.feat svg{width:20px;height:20px;color:var(--tint);flex:none}
+.radio .ck{margin-left:auto;color:var(--tint);visibility:hidden}
+.radio[aria-checked="true"] .ck{visibility:visible}
+.radio .ck svg{width:16px;height:16px;display:block}
+.asheet{padding:0 8px 30px;display:flex;flex-direction:column;gap:8px;animation:up .28s cubic-bezier(.2,.8,.2,1)}
+.agroup{background:rgba(250,250,250,.97);border-radius:14px;overflow:hidden}
+.agroup .ah{font-size:13px;color:var(--label2);text-align:center;padding:14px 16px;border-bottom:.5px solid var(--sep)}
+.agroup button{display:block;width:100%;border:0;background:none;height:57px;font-size:20px;color:#007AFF}
+.agroup button+button{border-top:.5px solid var(--sep)}
+.agroup button.red{color:var(--red)}
+.agroup button.bold{font-weight:600}
+
+/* banner notification */
+.banner{position:absolute;top:54px;left:10px;right:10px;z-index:40;background:rgba(245,245,245,.92);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:20px;padding:11px 14px;display:flex;gap:10px;align-items:center;box-shadow:0 8px 30px rgba(0,0,0,.18);animation:drop .35s cubic-bezier(.2,.8,.2,1)}
+@keyframes drop{from{transform:translateY(-130%)}}
+@media (max-width:440px){.banner{top:10px}}
+.banner .appi{width:36px;height:36px;border-radius:9px;background:var(--brand);display:flex;align-items:center;justify-content:center;flex:none}
+.banner .appi svg{width:24px;height:24px}
+.banner .bt{flex:1;min-width:0}
+.banner .bt b{display:flex;justify-content:space-between;font-size:14px;font-weight:600}
+.banner .bt b em{font-style:normal;font-weight:400;color:var(--label2);font-size:13px}
+.banner .bt span{display:block;font-size:14px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* worker onboarding */
+.wnav{flex:none;display:flex;align-items:center;justify-content:space-between;padding:4px 16px 4px}
+.wnav .stepn{font-size:15px;color:var(--label2)}
+.progress{display:flex;gap:5px;padding:4px 18px 4px}
+.progress i{flex:1;height:4px;border-radius:2px;background:#D1D1D6}
+.progress i.on{background:var(--tint)}
+.wbody{flex:1;min-height:0;overflow-y:auto;padding-bottom:16px}
+.wbody .lt h1{font-size:30px}
+.lead{font-size:15px;color:var(--label2);padding:0 18px 4px;margin:0;line-height:1.4}
+.cellr label{font-size:17px;flex:none;width:118px}
+.cellr input,.cellr select{flex:1;min-width:0;border:0;outline:0;font:inherit;font-size:17px;color:var(--label2);text-align:right;background:transparent;-webkit-appearance:none;appearance:none}
+.cellr select{direction:rtl}
+.seg{display:flex;background:var(--fill);border-radius:9px;padding:2px;width:100%}
+.seg button{flex:1;border:0;background:none;font-size:13px;font-weight:500;padding:7px 2px;border-radius:7px;color:var(--label)}
+.seg button[aria-pressed="true"]{background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.12);font-weight:600}
+.pick{display:flex;flex-wrap:wrap;gap:6px;padding:12px 16px}
+.pick button{border:0;background:var(--fill);color:var(--label);font-size:14px;font-weight:500;padding:7px 12px;border-radius:99px}
+.pick button[aria-pressed="true"]{background:var(--tint);color:#fff}
+.ib{width:30px;height:30px;border-radius:7px;background:var(--tint);color:#fff;display:flex;align-items:center;justify-content:center;flex:none}
+.ib svg{width:18px;height:18px}
+.ib.done{background:#34C759}
+.spin{width:20px;height:20px;border:2.5px solid #D1D1D6;border-top-color:var(--tint);border-radius:50%;animation:rot .7s linear infinite;flex:none;margin:0 26px}
+@keyframes rot{to{transform:rotate(360deg)}}
+.wfoot{flex:none;padding:10px 16px 30px;display:flex;flex-direction:column;gap:6px;background:var(--bg)}
+@media (max-width:440px){.wfoot{padding-bottom:14px}}
+.hero{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding:40px 28px 10px}
+.hero .circ{width:92px;height:92px;border-radius:50%;background:#E3F1E9;color:var(--tint);display:flex;align-items:center;justify-content:center}
+.hero .circ svg{width:46px;height:46px}
+.hero h2{font-size:26px;font-weight:700;margin:6px 0 0;line-height:1.2}
+.hero p{margin:0;font-size:15px;color:var(--label2);line-height:1.45}
+.card.static{position:relative;inset:auto;height:430px;margin:12px 16px 0;touch-action:auto}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="caption">
+  <b><span class="appicon"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M5 15 16 6l11 9v11a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V15Z" fill="#1F4D3A"/><path d="m11 18 3.6 3.6L21 15" stroke="#EFE6D6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Homely</b>
+  <span id="hint">Swipe right to save a worker, then message and hire them.</span>
+</div>
+<div class="mode" aria-label="Demo view">
+  <button type="button" id="modeHire" aria-pressed="true">I'm hiring</button>
+  <button type="button" id="modeWork" aria-pressed="false">I'm looking for work</button>
+</div>
+
+<div class="device">
+ <div class="screen" id="screen">
+  <div class="island"></div>
+  <div class="status"><span>9:41</span>
+   <span class="icons">
+    <svg viewBox="0 0 18 12" fill="#000"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
+    <svg viewBox="0 0 16 12" fill="#000"><path d="M8 2.2c2.3 0 4.4.9 6 2.4l1.1-1.2A10.2 10.2 0 0 0 8 .5C5.3.5 2.8 1.5.9 3.4L2 4.6a8.6 8.6 0 0 1 6-2.4Zm0 3.4c1.4 0 2.6.5 3.6 1.4l1.1-1.2A7 7 0 0 0 8 3.9a7 7 0 0 0-4.7 1.9l1.1 1.2c1-.9 2.2-1.4 3.6-1.4Zm0 3.3c.5 0 1 .2 1.3.5L8 10.9 6.7 9.4c.3-.3.8-.5 1.3-.5Z"/></svg>
+    <svg viewBox="0 0 27 12" fill="none"><rect x=".5" y=".5" width="23" height="11" rx="3" stroke="#000" opacity=".4"/><rect x="2" y="2" width="18" height="8" rx="1.8" fill="#000"/><path d="M25 4v4c.8-.3 1.3-1 1.3-2S25.8 4.3 25 4Z" fill="#000" opacity=".4"/></svg>
+   </span></div>
+
+  <div class="main" id="main">
+   <!-- Discover -->
+   <div class="scr" id="sDiscover">
+    <div class="lt"><h1 class="brandhead" aria-label="Homely"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M5 15 16 6l11 9v11a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V15Z" fill="#1F4D3A"/><path d="m11 18 3.6 3.6L21 15" stroke="#EFE6D6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Homely</span></h1><button class="pill" id="premBtn" type="button"></button></div>
+    <div class="deck" id="deck"></div>
+    <div class="actions">
+     <button class="round no" id="noBtn" type="button" aria-label="Pass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+     <button class="round yes" id="yesBtn" type="button" aria-label="Save"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-9.6-9.3C1 8.4 3 5 6.4 5c2 0 3.4 1.1 4.1 2.2h3c.7-1.1 2.1-2.2 4.1-2.2C21 5 23 8.4 21.6 11.7 19.5 16.4 12 21 12 21Z"/></svg></button>
+    </div>
+    <div class="left" id="left"></div>
+   </div>
+   <!-- Messages -->
+   <div class="scr" id="sMessages" hidden><div class="scroll"><div class="lt"><h1>Messages</h1></div><div id="msgList"></div></div></div>
+   <!-- Saved -->
+   <div class="scr" id="sSaved" hidden><div class="scroll"><div class="lt"><h1>Saved</h1></div><div id="savedList"></div></div></div>
+   <!-- Chat (pushed) -->
+   <div class="scr" id="sChat" hidden></div>
+   <!-- Worker onboarding -->
+   <div class="scr" id="sWorker" hidden></div>
+  </div>
+
+  <nav class="tabbar" id="tabbar" role="tablist">
+   <button role="tab" type="button" data-tab="Discover" aria-selected="true">
+    <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="7" y="4" width="14" height="19" rx="3" fill="currentColor" fill-opacity=".15"/><path d="M4.5 8.5v12a3 3 0 0 0 1.5 2.6M23.5 8.5v12a3 3 0 0 1-1.5 2.6"/></svg>Discover</button>
+   <button role="tab" type="button" data-tab="Messages" aria-selected="false">
+    <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M14 4.5c5.8 0 10 3.7 10 8.4s-4.2 8.4-10 8.4c-1.1 0-2.2-.1-3.2-.4L5.5 23l1.3-4.3C5 17.2 4 15.2 4 12.9c0-4.7 4.2-8.4 10-8.4Z" fill="currentColor" fill-opacity=".15"/></svg>Messages<span class="badge" id="badge" hidden></span></button>
+   <button role="tab" type="button" data-tab="Saved" aria-selected="false">
+    <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M14 23.5s-8.5-5.1-10.4-10.3C2.4 9.6 4.6 6 8.3 6c2.4 0 4.2 1.4 5.7 3.3C15.5 7.4 17.3 6 19.7 6c3.7 0 5.9 3.6 4.7 7.2C22.5 18.4 14 23.5 14 23.5Z" fill="currentColor" fill-opacity=".15"/></svg>Saved</button>
+  </nav>
+  <div class="homebar"></div>
+  <div id="overlay"></div>
+  <div id="bannerHost"></div>
+ </div>
+</div>
+<div class="demo-note">Class demo for a business plan. All workers, brands and messages are fictional, and no payments are made.</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const CHECK='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m3 8.5 3.2 3L13 4.5"/></svg>';
+const CHEV='<span class="chev"><svg viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m1 1 6 6-6 6"/></svg></span>';
+const LOGO='<svg viewBox="0 0 32 32" fill="none"><path d="M5 15 16 6l11 9v11a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V15Z" fill="#EFE6D6"/><path d="m11 18 3.6 3.6L21 15" stroke="#1F4D3A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const TONES=['#D9C6A5','#C8D5C4','#E2C9B8','#CBD3D8','#DCCFB0','#D4C2C9'];
+
+const W=[
+ {n:'María Guadalupe',a:41,area:'Álvaro Obregón',y:12,av:'Full-time',sk:['Cleaning','Cooking','Ironing'],ref:3,bio:'Worked 9 years with one family in San Ángel. Known for Mexican home cooking and keeping a big house organized.'},
+ {n:'Rosa Elena',a:35,area:'Tlalpan',y:8,av:'Entrada por salida',sk:['Childcare','Cleaning','Cooking'],ref:2,bio:'Cared for two kids from baby to school age. First-aid course in 2024. Calm, punctual, great with homework.'},
+ {n:'Juana',a:52,area:'Iztapalapa',y:20,av:'Part-time',sk:['Cleaning','Ironing','Laundry'],ref:4,bio:'Twenty years of experience. Available Monday, Wednesday and Friday. Detailed with clothes and delicate fabrics.'},
+ {n:'Alejandra',a:29,area:'Cuajimalpa',y:5,av:'Entrada por salida',sk:['Cleaning','Pet care','Cooking'],ref:2,bio:'Lives close to Santa Fe. Loves dogs and can walk them during the day. Cooks healthy and vegetarian meals.'},
+ {n:'Carmen',a:47,area:'Magdalena Contreras',y:15,av:'Full-time',sk:['Elder care','Cooking','Cleaning'],ref:3,bio:'Looked after an older couple for 6 years: meals, medication schedules and doctor visits. Patient and very reliable.'},
+ {n:'Verónica',a:38,area:'Coyoacán',y:10,av:'Part-time',sk:['Cleaning','Ironing','Organizing'],ref:2,bio:'Specialist in deep cleaning and closet organizing. Prefers two or three days a week.'},
+ {n:'Luis Ángel',a:33,area:'Tlalpan',y:7,av:'Part-time',sk:['Gardening','Cleaning','Repairs'],ref:2,bio:'Gardener and general help. Small repairs, pool cleaning and car washing. Weekends available.'},
+ {n:'Patricia',a:44,area:'Álvaro Obregón',y:14,av:'Entrada por salida',sk:['Cooking','Childcare','Cleaning'],ref:3,bio:'Former cook at a small restaurant. Plans the weekly menu and does the shopping. Great with teenagers.'},
+ {n:'Silvia',a:56,area:'Iztapalapa',y:25,av:'Full-time',sk:['Cleaning','Cooking','Elder care'],ref:4,bio:'Twenty-five years in family homes in Polanco and Lomas. Can live in. Strong references from two families.'},
+ {n:'Daniela',a:26,area:'Benito Juárez',y:4,av:'Part-time',sk:['Childcare','Cleaning','English basics'],ref:2,bio:'Studying early education at night. Picks kids up from school and helps with basic English homework.'}
+].map((w,i)=>({...w,id:i,tone:TONES[i%TONES.length],ini:initials(w.n)}));
+function initials(n){return n.split(' ').filter(Boolean).map(s=>s[0]).slice(0,2).join('').toUpperCase()}
+const first=w=>w.n.split(' ')[0];
+const byId=id=>W.find(w=>w.id===id);
+
+const FREE=6, FEE=999, PREMIUM=149;
+const PARTNERS=[
+ {b:'Limpio+',c:'#3A7CA5',o:'15% off cleaning supplies',code:'HOMELY15'},
+ {b:'FixaCasa',c:'#B5651D',o:'First plumbing or electrical visit for $199 MXN',code:'HOMELYFIX'},
+ {b:'LavaYa',c:'#6B5B95',o:'Free laundry pickup on your first order',code:'HOMELYLAVA'}
+];
+
+// state
+let premium=false, used=0, idx=0;
+const status={};   // id -> saved | hired | paused
+const chats={};    // id -> [{f:'me'|'them'|'sys', t}]
+const unread=new Set();
+let savedOrder=[];
+let tabNow='Discover', chatId=null, chatFrom='Messages';
+const gotCodes=new Set();
+
+// seed one existing conversation so the app feels lived-in
+(function seed(){
+  const r=W[1]; status[r.id]='saved'; savedOrder.push(r.id);
+  chats[r.id]=[
+   {f:'sys',t:'<b>You saved Rosa Elena</b> · Yesterday'},
+   {f:'me',t:'Hi Rosa! We\'re looking for help with our two kids after school. Are you available?'},
+   {f:'them',t:'Hi! Yes, I\'m available entrada por salida, from 8 to 6. How old are your kids?'}
+  ];
+  unread.add(r.id);
+})();
+let deck=W.filter(w=>!status[w.id]);
+
+/* ---------- Discover ---------- */
+function cardHTML(w){return `
+ <div class="photo" style="background:${w.tone}">
+   <div class="vbadge">${CHECK}Verified</div><div class="avail">${esc(w.av)}</div>
+   <div class="avatar">${esc(w.ini)}</div>
+   <div class="stamp like">SAVE</div><div class="stamp nope">PASS</div>
+ </div>
+ <div class="info">
+   <div class="name">${esc(w.n)} <small>${w.a}</small></div>
+   <div class="meta">${esc(w.area)} · ${w.y} years of experience</div>
+   <div class="chips">${w.sk.map(s=>`<span class="chip">${esc(s)}</span>`).join('')}</div>
+   <div class="bio">${esc(w.bio)}</div>
+   <div class="checks"><span>${CHECK}Official ID</span><span>${CHECK}Background check</span><span>${CHECK}${w.ref} references</span></div>
+ </div>`}
+
+function renderDeck(){
+  const d=$('deck'); d.innerHTML='';
+  const rest=deck.length-idx;
+  if(rest<=0){
+    d.innerHTML=`<div class="empty"><h3>You're all caught up</h3><p>New verified workers join every week in your area.</p><button class="big" id="again" type="button" style="width:auto;padding:0 22px;margin-top:8px">Start over</button></div>`;
+    $('again').onclick=()=>{deck=W.filter(w=>!status[w.id]);idx=0;used=premium?used:0;renderDeck()};
+  } else {
+    [1,0].forEach(o=>{const w=deck[idx+o]; if(!w) return;
+      const c=document.createElement('div'); c.className='card'+(o?' back':''); c.innerHTML=cardHTML(w); d.appendChild(c); if(!o) drag(c);});
+  }
+  $('noBtn').disabled=$('yesBtn').disabled=rest<=0;
+  $('left').textContent=premium?'Premium · unlimited swipes':`${Math.max(0,FREE-used)} free swipes left today`;
+  const pb=$('premBtn');
+  pb.innerHTML=premium?'<svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 12h12l1-7-4 3-3-5-3 5-4-3 1 7Z"/></svg>Premium':'Free plan';
+  pb.classList.toggle('on',premium);
+}
+function drag(c){
+  let sx=0,sy=0,dx=0,dy=0,down=false;const like=c.querySelector('.like'),nope=c.querySelector('.nope');
+  c.addEventListener('pointerdown',e=>{down=true;sx=e.clientX;sy=e.clientY;c.setPointerCapture(e.pointerId);c.classList.remove('anim')});
+  c.addEventListener('pointermove',e=>{if(!down)return;dx=e.clientX-sx;dy=e.clientY-sy;
+    c.style.transform=`translate(${dx}px,${dy*.3}px) rotate(${dx/18}deg)`;
+    like.style.opacity=Math.max(0,Math.min(1,dx/90));nope.style.opacity=Math.max(0,Math.min(1,-dx/90))});
+  const end=()=>{if(!down)return;down=false;
+    if(Math.abs(dx)>100) swipe(dx>0); else {c.classList.add('anim');c.style.transform='';like.style.opacity=nope.style.opacity=0}
+    dx=dy=0};
+  c.addEventListener('pointerup',end);c.addEventListener('pointercancel',end);
+}
+function swipe(right){
+  if(idx>=deck.length) return;
+  const c=$('deck').querySelector('.card:not(.back)');
+  if(!premium&&used>=FREE){ if(c){c.classList.add('anim');c.style.transform='';c.querySelectorAll('.stamp').forEach(s=>s.style.opacity=0)} paywall(); return }
+  const w=deck[idx];
+  if(c){c.classList.add('anim');c.style.transform=`translate(${right?520:-520}px,40px) rotate(${right?24:-24}deg)`;c.style.opacity=0;c.querySelector(right?'.like':'.nope').style.opacity=1}
+  used++; idx++;
+  if(right){
+    status[w.id]='saved'; savedOrder.unshift(w.id);
+    chats[w.id]=[{f:'sys',t:`<b>You saved ${esc(w.n)}</b> · Today<br>Say hi to ask about availability or set up an interview.`}];
+    banner('Homely',`${first(w)} was added to Saved. Say hi in Messages.`);
+  }
+  setTimeout(renderDeck,260);
+}
+$('noBtn').onclick=()=>swipe(false); $('yesBtn').onclick=()=>swipe(true);
+$('premBtn').onclick=()=>{premium?banner('Homely','You\'re on Premium: unlimited swipes.'):paywall()};
+
+/* ---------- Messages & Saved ---------- */
+function lastLine(id){
+  const m=chats[id]||[]; const l=[...m].reverse().find(x=>x.f!=='sys');
+  if(status[id]==='paused') return 'Profile paused · under review';
+  return l?(l.f==='me'?'You: ':'')+l.t:'Saved · Start the conversation';
+}
+function renderMessages(){
+  const ids=savedOrder.filter(id=>chats[id]);
+  $('msgList').innerHTML=ids.length?`<div class="group">${ids.map(id=>{const w=byId(id);const u=unread.has(id);
+    return `<button class="cellr" type="button" data-chat="${id}" style="--inset:74px"><div class="av" style="background:${w.tone}">${esc(w.ini)}</div>
+     <div class="ct"><b>${esc(w.n)}</b><span class="${u?'unread':''}">${lastLine(id).replace(/<[^>]+>/g,'')}</span></div>
+     <span class="time">${u?'<span class="dot"></span>':''}${id===1?'Yesterday':'Now'}</span></button>`}).join('')}</div>`
+   :`<div class="empty" style="position:static;padding-top:80px"><h3>No messages yet</h3><p>Save a worker on Discover to start a conversation.</p></div>`;
+  $('msgList').querySelectorAll('[data-chat]').forEach(b=>b.onclick=()=>openChat(+b.dataset.chat,'Messages'));
+  updBadge();
+}
+function renderSaved(){
+  const rows=savedOrder.map(id=>{const w=byId(id);const s=status[id];
+    const tag=s==='hired'?'<span class="tag ok">Hired</span>':s==='paused'?'<span class="tag paused">Paused</span>':'';
+    return `<button class="cellr" type="button" data-chat="${id}" style="--inset:74px"><div class="av" style="background:${w.tone}">${esc(w.ini)}</div>
+     <div class="ct"><b>${esc(w.n)}, ${w.a}</b><span>${esc(w.av)} · ${esc(w.area)}</span></div>${tag}${CHEV}</button>`}).join('');
+  $('savedList').innerHTML=
+   `<div class="sec">Your workers</div>`+(rows?`<div class="group">${rows}</div>`:`<div class="group"><div class="cellr" style="color:var(--label2);font-size:15px">Swipe right on Discover to save workers.</div></div>`)+
+   `<div class="foot">Every worker on Homely has passed ID and background verification.</div>`+
+   `<div class="sec">Homely partners</div><div class="group">${PARTNERS.map((p,i)=>`<div class="cellr" style="--inset:74px"><div class="logo" style="background:${p.c}">${p.b[0]}</div>
+     <div class="ct"><b>${p.b}</b><span style="white-space:normal">${p.o}</span></div>
+     <button class="get${gotCodes.has(i)?' done':''}" type="button" data-p="${i}">${gotCodes.has(i)?'Copied':'GET'}</button></div>`).join('')}</div>
+   <div class="foot" style="padding-bottom:24px">Offers from home-service brands that partner with Homely.</div>`;
+  $('savedList').querySelectorAll('[data-chat]').forEach(b=>b.onclick=()=>openChat(+b.dataset.chat,'Saved'));
+  $('savedList').querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{const p=PARTNERS[+b.dataset.p];gotCodes.add(+b.dataset.p);
+    try{navigator.clipboard.writeText(p.code).catch(()=>{})}catch(e){}
+    banner(p.b,`Code ${p.code} copied. Use it at checkout.`);renderSaved()});
+}
+function updBadge(){const n=unread.size;$('badge').hidden=!n;$('badge').textContent=n}
+
+/* ---------- Chat ---------- */
+const QUICK=['Hi! Are you available to start Monday?','What\'s your rate?','Could we do an interview this week?'];
+function replyFor(w,t){
+  const s=t.toLowerCase();
+  if(/rate|pay|cobra|salary|much|price|cost/.test(s)) return w.av==='Full-time'?'For full-time I usually ask $10,000 MXN a month, with Sundays off. We can talk about it.':`For ${w.av.toLowerCase()} I usually ask $550 MXN per day. We can talk about it.`;
+  if(/interview|meet|visit|see you/.test(s)) return 'Of course. I can come by Thursday at 10:00 so you can meet me. Does that work?';
+  if(/monday|available|start|when/.test(s)) return `Yes! I can start this Monday. I'm looking for ${w.av.toLowerCase()} work. What time would you need me?`;
+  if(/reference/.test(s)) return 'My references are already verified in Homely, but I\'m happy to answer any questions.';
+  if(/thursday|works|perfect|great|ok|sure|yes/.test(s)) return 'Perfect, see you then! You can confirm the hire here in Homely whenever you\'re ready.';
+  if(/^(hi|hello|hola|hey)\b/.test(s)) return `Hi! Thanks for saving my profile. How can I help?`;
+  return 'Thanks for your message! Happy to tell you more about my experience.';
+}
+function openChat(id,from){
+  chatId=id; chatFrom=from; unread.delete(id); updBadge();
+  const S=$('sChat'); S.hidden=false; S.classList.remove('push'); void S.offsetWidth; S.classList.add('push');
+  $('tabbar').hidden=true; renderChat(true);
+}
+function closeChat(){chatId=null;$('sChat').hidden=true;$('tabbar').hidden=false;showTab(chatFrom)}
+function renderChat(focusInput){
+  const w=byId(chatId), s=status[chatId], m=chats[chatId]||(chats[chatId]=[]);
+  const strip=s==='paused'?`<div class="strip paused"><span>This profile is paused while our Trust &amp; Safety team reviews your report. We'll reply within 24 hours.</span></div>`
+   :s==='hired'?`<div class="strip hired"><span>✓ Hired through Homely</span><button class="sbtn red" type="button" id="cReport">Report</button></div>`
+   :`<div class="strip"><span>Keep the hire in Homely so you stay protected.</span><button class="sbtn" type="button" id="cHire">Hire</button></div>`;
+  let lastMe=-1; m.forEach((x,i)=>{if(x.f==='me')lastMe=i});
+  const thread=m.map((x,i)=>x.f==='sys'?`<div class="sys">${x.t}</div>`:`<div class="bub ${x.f}">${esc(x.t)}</div>${i===lastMe&&i===m.length-1?'<div class="read">Delivered</div>':''}`).join('');
+  $('sChat').innerHTML=`
+   <div class="nav"><button class="back" type="button" id="cBack"><svg viewBox="0 0 12 20" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2 2 10l8 8"/></svg>${chatFrom}</button>
+    <div class="who"><div class="av sm" style="background:${w.tone}">${esc(w.ini)}</div><div class="nm">${esc(w.n)}</div><div class="vf">${s==='paused'?'Under review':'✓ Verified'}</div></div>
+    <button class="more" type="button" id="cMore" aria-label="More"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button></div>
+   ${strip}
+   <div class="thread" id="thread">${thread}</div>
+   ${s==='paused'?'':`<div class="quick" id="quick">${QUICK.map(q=>`<button type="button">${esc(q)}</button>`).join('')}</div>`}
+   <form class="composer${s==='paused'?' off':''}" id="cForm"><button class="plus" type="button" aria-label="Attach"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M8 2v12M2 8h12"/></svg></button>
+    <div class="field"><input id="cInput" placeholder="Message" autocomplete="off" aria-label="Message"><button class="send" type="submit" id="cSend" disabled aria-label="Send"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13V3M3.5 7.5 8 3l4.5 4.5"/></svg></button></div></form>`;
+  const th=$('thread'); th.scrollTop=th.scrollHeight;
+  $('cBack').onclick=closeChat;
+  $('cMore').onclick=()=>actionSheet(w);
+  if($('cHire')) $('cHire').onclick=()=>hireSheet(w);
+  if($('cReport')) $('cReport').onclick=()=>reportSheet(w);
+  const inp=$('cInput');
+  inp.oninput=()=>{$('cSend').disabled=!inp.value.trim()};
+  $('cForm').onsubmit=e=>{e.preventDefault();const t=inp.value.trim();if(t)send(t)};
+  if($('quick')) $('quick').querySelectorAll('button').forEach(b=>b.onclick=()=>send(b.textContent));
+}
+function send(t){
+  const id=chatId, w=byId(id);
+  chats[id].push({f:'me',t}); renderChat();
+  const th=$('thread'); const typ=document.createElement('div'); typ.className='typing'; typ.innerHTML='<i></i><i></i><i></i>';
+  setTimeout(()=>{ if(chatId===id&&$('thread')){$('thread').appendChild(typ);$('thread').scrollTop=1e6} },600);
+  setTimeout(()=>{
+    if(status[id]==='paused') return;
+    const r=replyFor(w,t); chats[id].push({f:'them',t:r});
+    if(chatId===id) renderChat(); else {unread.add(id);updBadge();banner(w.n,r);if(tabNow==='Messages')renderMessages()}
+  },2000);
+}
+
+/* ---------- Sheets ---------- */
+function overlay(html,cls){
+  $('overlay').innerHTML=`<div class="dim" id="dim">${html}</div>`;
+  $('dim').addEventListener('click',e=>{if(e.target.id==='dim')closeOv()});
+  const b=$('dim').querySelector('button'); if(b) b.focus();
+}
+function closeOv(){$('overlay').innerHTML=''}
+function actionSheet(w){
+  const s=status[w.id];
+  overlay(`<div class="asheet"><div class="agroup"><div class="ah">${esc(w.n)}</div>
+    ${s==='saved'?`<button type="button" id="aHire">Hire ${esc(first(w))}</button>`:''}
+    <button type="button" id="aProfile">View verification</button>
+    ${s!=='paused'?`<button type="button" class="red" id="aReport">Report a concern</button>`:''}</div>
+    <div class="agroup"><button type="button" class="bold" id="aCancel">Cancel</button></div></div>`);
+  if($('aHire')) $('aHire').onclick=()=>hireSheet(w);
+  if($('aReport')) $('aReport').onclick=()=>reportSheet(w);
+  $('aProfile').onclick=()=>{closeOv();banner('Homely',`${first(w)}: official ID, background check and ${w.ref} references verified.`)};
+  $('aCancel').onclick=closeOv;
+}
+function paywall(){
+  overlay(`<div class="sheet"><div class="grab"></div><h3>You've used your ${FREE} free swipes today</h3>
+   <p>Upgrade to keep browsing verified workers now, or come back tomorrow.</p>
+   <div class="price">$${PREMIUM} MXN <small>/ month</small></div>
+   <div class="group">${['Unlimited swipes','See who\'s available this week first','Priority support from Trust & Safety'].map(f=>`<div class="cellr feat">${CHECK}${esc(f)}</div>`).join('')}</div>
+   <button class="big" type="button" id="goPrem">Start Premium</button>
+   <button class="big plain" type="button" id="later">Not now</button>
+   <div class="fine">Demo only, no payment is made. Homely is always free for workers.</div></div>`);
+  $('goPrem').onclick=()=>{premium=true;closeOv();renderDeck();banner('Homely','Welcome to Premium. Unlimited swipes are on.')};
+  $('later').onclick=closeOv;
+}
+function hireSheet(w){
+  overlay(`<div class="sheet"><div class="grab"></div><h3>Hire ${esc(w.n)}?</h3>
+   <p>${esc(first(w))} passed ID and background verification and has ${w.ref} verified references.</p>
+   <div class="price">$${FEE} MXN <small>one-time fee</small></div>
+   <p style="font-size:13px">Charged only when the hire is confirmed in the app.</p>
+   <button class="big" type="button" id="hOk">Confirm Hire</button>
+   <button class="big plain" type="button" id="hNo">Cancel</button>
+   <div class="fine">Demo only, no payment is made.</div></div>`);
+  $('hOk').onclick=()=>{status[w.id]='hired';(chats[w.id]=chats[w.id]||[]).push({f:'sys',t:`<b>Hire confirmed</b> · $${FEE} MXN fee<br>${esc(first(w))} is now your Homely worker.`});
+    closeOv();refresh();banner('Homely',`You hired ${first(w)}. Hire confirmed.`)};
+  $('hNo').onclick=closeOv;
+}
+function reportSheet(w){
+  const R=['Didn\'t show up','Safety concern','Something was damaged or missing','Unprofessional behavior','Other'];
+  let pick=-1;
+  overlay(`<div class="sheet"><div class="grab"></div><h3>Report a concern</h3>
+   <p>Tell us what happened with ${esc(first(w))}. Our Trust &amp; Safety team reviews every report within 24 hours.</p>
+   <div class="group" role="radiogroup">${R.map((r,i)=>`<button class="cellr radio" type="button" role="radio" aria-checked="false" data-r="${i}">${esc(r)}<span class="ck">${CHECK}</span></button>`).join('')}</div>
+   <button class="big red" type="button" id="rSend" disabled>Submit Report</button>
+   <button class="big plain" type="button" id="rNo">Cancel</button>
+   <div class="fine">The profile is paused right away while we review it.</div></div>`);
+  $('dim').querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{pick=+b.dataset.r;$('dim').querySelectorAll('[data-r]').forEach(x=>x.setAttribute('aria-checked',x===b));$('rSend').disabled=false});
+  $('rSend').onclick=()=>{status[w.id]='paused';
+    (chats[w.id]=chats[w.id]||[]).push({f:'sys',t:`<b>Report sent</b> · ${esc(R[pick])}<br>${esc(first(w))}'s profile is paused while Trust &amp; Safety reviews it.`});
+    deck=deck.filter((x,i)=>i<idx||x.id!==w.id);
+    closeOv();refresh();banner('Homely Trust & Safety','We received your report and will reply within 24 hours.')};
+  $('rNo').onclick=closeOv;
+}
+function refresh(){ if(chatId!==null) renderChat(); if(tabNow==='Saved')renderSaved(); if(tabNow==='Messages')renderMessages() }
+
+let bt;
+function banner(title,text){
+  $('bannerHost').innerHTML=`<div class="banner" role="status"><div class="appi">${LOGO}</div><div class="bt"><b>${esc(title)}<em>now</em></b><span>${esc(text)}</span></div></div>`;
+  clearTimeout(bt); bt=setTimeout(()=>{$('bannerHost').innerHTML=''},2600);
+}
+
+/* ---------- Tabs ---------- */
+function showTab(t){
+  tabNow=t;
+  ['Discover','Messages','Saved'].forEach(x=>$('s'+x).hidden=x!==t);
+  document.querySelectorAll('#tabbar button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));
+  if(t==='Messages')renderMessages(); if(t==='Saved')renderSaved();
+}
+document.querySelectorAll('#tabbar button').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&$('overlay').innerHTML){closeOv();return}
+  if($('overlay').innerHTML||$('sDiscover').hidden||chatId!==null||!$('sWorker').hidden) return;
+  if(e.target.tagName==='INPUT') return;
+  if(e.key==='ArrowRight')swipe(true); if(e.key==='ArrowLeft')swipe(false);
+});
+
+/* ---------- Worker onboarding ---------- */
+const AREAS=['Álvaro Obregón','Benito Juárez','Coyoacán','Cuajimalpa','Iztapalapa','Magdalena Contreras','Miguel Hidalgo','Tlalpan'];
+const AVAILS=['Full-time','Part-time','Entrada por salida'];
+const SKILLS=['Cleaning','Cooking','Childcare','Ironing','Elder care','Pet care','Laundry','Gardening'];
+const IC={
+ id:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M6 16c.6-1.4 1.7-2 3-2s2.4.6 3 2M15 10h3M15 13h3"/></svg>',
+ selfie:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="10" r="3"/><path d="M7.5 17c1-2 2.6-3 4.5-3s3.5 1 4.5 3"/></svg>',
+ refs:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3 19c.8-3 3.2-5 6-5s5.2 2 6 5"/><path d="M16 5.5a3 3 0 0 1 0 5M18 14c1.6.7 2.6 2.4 3 5"/></svg>',
+ bg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6v5c0 4.5 3 8 7 10 4-2 7-5.5 7-10V6l-7-3Z"/><path d="m9 12 2 2 4-4"/></svg>'
+};
+const VSTEPS=[['id','Official ID','INE or passport','Upload'],['selfie','Selfie Check','Confirms the ID is you','Start'],['refs','References','2 previous employers','Add'],['bg','Background Check','Third-party provider','Accept']];
+let ws=0, vdone=new Set(), vbusy=null;
+let me={n:'Lucía Hernández',a:31,y:6,area:'Tlalpan',av:'Entrada por salida',sk:['Cleaning','Cooking','Childcare']};
+const prog=()=>`<div class="progress">${[0,1,2,3].map(i=>`<i class="${i<=ws?'on':''}"></i>`).join('')}</div>`;
+function wnav(left){return `<div class="wnav">${left?`<button class="back" type="button" id="wBack"><svg viewBox="0 0 12 20" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2 2 10l8 8"/></svg>Back</button>`:'<span></span>'}<span class="stepn">Step ${ws+1} of 4</span></div>${prog()}`}
+function wrender(){
+  const V=$('sWorker');
+  if(ws===0){
+    V.innerHTML=`${wnav(false)}<div class="wbody"><div class="lt"><h1>Create your profile</h1></div><p class="lead">Employers in Mexico City see this once you're verified.</p>
+     <div class="sec">About you</div><div class="group">
+      <div class="cellr"><label for="wName">Name</label><input id="wName" value="${esc(me.n)}"></div>
+      <div class="cellr"><label for="wAge">Age</label><input id="wAge" type="number" min="18" max="80" value="${me.a}"></div>
+      <div class="cellr"><label for="wYears">Experience</label><input id="wYears" type="number" min="0" max="50" value="${me.y}"></div>
+      <div class="cellr"><label for="wArea">Alcaldía</label><select id="wArea">${AREAS.map(a=>`<option${a===me.area?' selected':''}>${a}</option>`).join('')}</select>${CHEV}</div></div>
+     <div class="sec">Availability</div><div class="group"><div class="cellr"><div class="seg" id="wAvail">${AVAILS.map(a=>`<button type="button" aria-pressed="${a===me.av}">${a}</button>`).join('')}</div></div></div>
+     <div class="sec">Skills</div><div class="group"><div class="pick" id="wSkills">${SKILLS.map(s=>`<button type="button" aria-pressed="${me.sk.includes(s)}">${s}</button>`).join('')}</div></div>
+     <div class="foot">Homely is always free for workers.</div></div>
+     <div class="wfoot"><button class="big" type="button" id="wNext">Continue</button></div>`;
+    $('wAvail').querySelectorAll('button').forEach(b=>b.onclick=()=>{me.av=b.textContent;$('wAvail').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b))});
+    $('wSkills').querySelectorAll('button').forEach(b=>b.onclick=()=>{const on=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',on);me.sk=on?[...me.sk,b.textContent]:me.sk.filter(s=>s!==b.textContent)});
+    $('wNext').onclick=()=>{me.n=$('wName').value.trim()||'Lucía Hernández';me.a=+$('wAge').value||31;me.y=+$('wYears').value||0;me.area=$('wArea').value;if(!me.sk.length)me.sk=['Cleaning'];ws=1;wrender()};
+  } else if(ws===1){
+    const all=vdone.size===VSTEPS.length;
+    V.innerHTML=`${wnav(true)}<div class="wbody"><div class="lt"><h1>Verify your identity</h1></div><p class="lead">Every worker on Homely completes these checks. They're why employers trust your profile.</p>
+     <div class="sec">Required</div><div class="group">${VSTEPS.map(([k,t,d,a])=>`<div class="cellr" style="--inset:58px"><div class="ib${vdone.has(k)?' done':''}">${vdone.has(k)?CHECK:IC[k]}</div>
+       <div class="ct"><b>${t}</b><span>${d}</span></div>${vdone.has(k)?'<span class="tag ok">Done</span>':vbusy===k?'<span class="spin"></span>':`<button class="get" type="button" data-k="${k}">${a}</button>`}</div>`).join('')}</div>
+     <div class="foot">Demo only. Nothing is uploaded and no real check is run.</div></div>
+     <div class="wfoot"><button class="big" type="button" id="wSend"${all?'':' disabled'}>Send for Review</button></div>`;
+    $('wBack').onclick=()=>{ws=0;wrender()};
+    V.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{if(vbusy)return;vbusy=b.dataset.k;wrender();setTimeout(()=>{vdone.add(vbusy);vbusy=null;if(ws===1)wrender()},700)});
+    $('wSend').onclick=()=>{ws=2;wrender()};
+  } else if(ws===2){
+    V.innerHTML=`${wnav(false)}<div class="wbody"><div class="hero"><div class="circ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+     <h2>Your profile is under review</h2><p>Our Trust &amp; Safety team checks every application. You'll get a notification within 24 to 48 hours.</p></div></div>
+     <div class="wfoot"><button class="big plain" type="button" id="wSkip">Skip Ahead (Demo)</button></div>`;
+    $('wSkip').onclick=()=>{golive();ws=3;wrender();banner('Homely','You\'re verified! Your profile is now live.')};
+  } else {
+    const w=byId(me.id);
+    V.innerHTML=`${wnav(false)}<div class="wbody"><div class="lt"><h1>You're verified</h1></div><p class="lead">Your profile is live. This is exactly what employers see.</p>
+     <div class="card static">${cardHTML(w)}</div></div>
+     <div class="wfoot"><button class="big" type="button" id="wSee">See It as an Employer</button><button class="big plain" type="button" id="wReset">Start a New Sign-Up</button></div>`;
+    $('wSee').onclick=()=>setMode('hire');
+    $('wReset').onclick=()=>{ws=0;vdone=new Set();wrender()};
+  }
+}
+function golive(){
+  const w={n:me.n,a:me.a,area:me.area,y:me.y,av:me.av,sk:me.sk.slice(0,3),ref:2,id:Date.now(),tone:'#C8D5C4',ini:initials(me.n),
+    bio:`New on Homely. ${me.y} years of experience in family homes, looking for ${me.av.toLowerCase()} work in ${me.area}.`};
+  me.id=w.id; W.push(w); deck.splice(idx,0,w); renderDeck();
+}
+function setMode(m){
+  const work=m==='work';
+  $('modeHire').setAttribute('aria-pressed',!work); $('modeWork').setAttribute('aria-pressed',work);
+  closeOv(); $('bannerHost').innerHTML='';
+  $('hint').textContent=work?'Sign up as a domestic worker and go through verification.':'Swipe right to save a worker, then message and hire them.';
+  if(work){ $('sChat').hidden=true; chatId=null; ['Discover','Messages','Saved'].forEach(x=>$('s'+x).hidden=true); $('tabbar').hidden=true; $('sWorker').hidden=false; wrender(); }
+  else { $('sWorker').hidden=true; $('tabbar').hidden=false; showTab('Discover'); }
+}
+$('modeHire').onclick=()=>setMode('hire'); $('modeWork').onclick=()=>setMode('work');
+
+renderDeck(); updBadge();
+</script>
+</html>
