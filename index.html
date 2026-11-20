@@ -459,8 +459,39 @@ function match(w,f){f=f||filt;
   if(f.sk.length&&!f.sk.some(x=>w.sk.includes(x))) return false;
   return true}
 const filtOn=()=>filt.av!=='All'||filt.areas.length||filt.sk.length;
-function pool(f){const k=w=>w.id===undoTop?2:(w.fresh?1:0);
+function pool(f){const k=w=>w.id===undoTop?3:(w.fresh?2:(w.gen?0:1));
   return W.filter(w=>!seen.has(w.id)&&!status[w.id]&&match(w,f)).sort((a,b)=>k(b)-k(a))}
+
+/* ---------- Endless fictional workers ---------- */
+const GF=['Guadalupe','Leticia','Adriana','Gabriela','Teresa','Martha','Claudia','Norma','Elena','Mónica','Beatriz','Yolanda','Araceli','Rocío','Isabel','Laura','Sandra','Margarita','Lorena','Ximena','Fernanda','Mariana','Diana','Karla','Socorro','Angélica','Rosario','Esperanza'];
+const GM=['Javier','Miguel','José Luis','Antonio','Raúl'];
+const GSK=['Cleaning','Cooking','Childcare','Ironing','Elder care','Pet care','Laundry','Gardening'];
+const GBIO={Cleaning:'years keeping family homes spotless. Organized, careful and always on time.',
+ Cooking:'years in family homes. Loves cooking traditional Mexican food and can plan the weekly menu.',
+ Childcare:'years looking after kids of all ages. Patient, playful and very responsible.',
+ 'Elder care':'years caring for older adults: meals, walks and medication schedules.',
+ Ironing:'years in family homes. Detailed with clothes and delicate fabrics.',
+ 'Pet care':'years in family homes. Animal lover who can walk and feed pets during the day.',
+ Laundry:'years in family homes. Takes care of the whole week\'s laundry and keeps closets tidy.',
+ Gardening:'years keeping gardens and patios looking great. Also helps with general cleaning.'};
+let genId=1000;
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const rint=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+function genWorker(f){
+  f=f||filt;
+  const av=f.av!=='All'?f.av:pick(AVAILS);
+  const area=f.areas.length?pick(f.areas):pick(AREAS);
+  const sk=[]; if(f.sk.length) sk.push(pick(f.sk));
+  while(sk.length<3){const x=pick(GSK); if(!sk.includes(x)) sk.push(x)}
+  const male=Math.random()<.1&&!sk.includes('Childcare');
+  const n=male?pick(GM):pick(GF);
+  const a=rint(24,57), y=rint(2,Math.min(28,a-20));
+  const h=rint(7,9);
+  const tail=av==='Full-time'?'Looking for a full-time position with one family.':av==='Part-time'?'Available a few days a week.':`Available entrada por salida from ${h} am to ${h-2} pm.`;
+  const w={n,a,area,y,av,sk,ref:rint(2,4),bio:`${y} ${GBIO[sk[0]]} ${tail}`,id:genId++,gen:true,tone:pick(TONES),ini:initials(n),
+    hair:male?5:rint(0,4),r:Math.round((4.5+Math.random()*.5)*10)/10,rc:rint(3,60),km:Math.round(((AREA_KM[area]||8)+Math.random()*3-1.5)*10)/10};
+  W.push(w); return w;
+}
 
 /* ---------- Discover ---------- */
 function cardHTML(w){return `
@@ -480,7 +511,8 @@ function cardHTML(w){return `
 
 function renderDeck(backIn){
   const d=$('deck'); d.innerHTML='';
-  deck=pool(); const rest=deck.length;
+  deck=pool(); while(deck.length<2){genWorker(filt); deck=pool()}
+  const rest=deck.length;
   if(rest<=0){
     d.innerHTML=filtOn()?`<div class="empty"><h3>No workers match your filters</h3><p>Try a different availability, area or skill.</p><button class="big" id="again" type="button" style="width:auto;padding:0 22px;margin-top:8px">Clear Filters</button></div>`
      :`<div class="empty"><h3>You're all caught up</h3><p>New verified workers join every week in your area.</p><button class="big" id="again" type="button" style="width:auto;padding:0 22px;margin-top:8px">Start over</button></div>`;
@@ -837,7 +869,7 @@ function filterSheet(){
     $('fAv').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===f.av));
     $('fAr').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',f.areas.includes(b.dataset.v)));
     $('fSk').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',f.sk.includes(b.dataset.v)));
-    const n=pool(f).length; $('fShow').textContent=n?`Show ${n} worker${n===1?'':'s'}`:'No workers match';
+    const n=pool(f).length; $('fShow').textContent=n?`Show ${n}+ workers`:'Show workers';
   };
   const tog=(arr,v)=>{const i=arr.indexOf(v);i<0?arr.push(v):arr.splice(i,1)};
   $('fAv').querySelectorAll('button').forEach(b=>b.onclick=()=>{f.av=b.dataset.v;upd()});
@@ -879,7 +911,8 @@ function resetAll(){
   for(const k in status) delete status[k];
   for(const k in chats) delete chats[k];
   unread.clear(); savedOrder=[]; gotCodes.clear(); chatId=null;
-  for(let i=W.length-1;i>=0;i--) if(W[i].fresh) W.splice(i,1);
+  for(let i=W.length-1;i>=0;i--) if(W[i].fresh||W[i].gen) W.splice(i,1);
+  genId=1000;
   ws=0; vdone=new Set(); vbusy=null; me={...ME0,sk:[...ME0.sk]}; delete me.id;
   seed(); closeOv(); $('bannerHost').innerHTML=''; $('sChat').hidden=true; $('sWP').hidden=true;
   setMode('hire'); updBadge(); renderDeck(); launch();
