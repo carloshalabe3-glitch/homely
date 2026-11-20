@@ -18,6 +18,7 @@
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{height:100%}
+html{touch-action:manipulation}
 body{margin:0;background:var(--brand);font-family:var(--font);color:var(--label);-webkit-font-smoothing:antialiased;
   padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:16px;
   display:flex;flex-direction:column;align-items:center;gap:12px}
@@ -81,7 +82,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 @keyframes appear{from{opacity:0}}
 .card.anim{transition:transform .32s ease, opacity .32s ease}
 .photo{flex:1;min-height:110px;position:relative;display:flex;align-items:center;justify-content:center}
-.avatar{width:108px;height:108px;border-radius:50%;background:rgba(255,255,255,.55);display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:700;color:var(--brand);letter-spacing:.01em}
+.avatar{overflow:hidden;width:108px;height:108px;border-radius:50%;background:rgba(255,255,255,.55);display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:700;color:var(--brand);letter-spacing:.01em}
 .vbadge{position:absolute;top:12px;left:12px;display:flex;align-items:center;gap:4px;background:var(--brand);color:#fff;font-size:12px;font-weight:600;padding:5px 9px;border-radius:99px}
 .vbadge svg{width:13px;height:13px}
 .avail{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.9);font-size:12px;font-weight:600;padding:5px 9px;border-radius:99px}
@@ -116,7 +117,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .cellr{display:flex;align-items:center;gap:12px;padding:10px 16px;min-height:44px;position:relative;width:100%;border:0;background:var(--cell);text-align:left;font-size:17px;color:var(--label)}
 .cellr+.cellr::before{content:"";position:absolute;top:0;right:0;left:var(--inset,16px);border-top:.5px solid var(--sep)}
 button.cellr:active{background:#E5E5EA}
-.av{width:46px;height:46px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--brand);font-size:17px}
+.av{overflow:hidden;width:46px;height:46px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--brand);font-size:17px}
 .av.sm{width:34px;height:34px;font-size:13px}
 .ct{flex:1;min-width:0}
 .ct b{display:block;font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -245,12 +246,84 @@ button.cellr:active{background:#E5E5EA}
 .hero h2{font-size:26px;font-weight:700;margin:6px 0 0;line-height:1.2}
 .hero p{margin:0;font-size:15px;color:var(--label2);line-height:1.45}
 .card.static{position:relative;inset:auto;height:430px;margin:12px 16px 0;touch-action:auto}
-@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+.avatar svg,.av svg{width:100%;height:100%;display:block}
+.rate{display:flex;gap:5px;align-items:center;font-size:13.5px;color:var(--label2)}
+.rate .star{color:#C98A00;font-weight:600}
+@media (max-height:800px){.card .bio{display:none}}
+/* launch screen */
+.launch{position:absolute;inset:0;z-index:60;background:var(--brand);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;transition:opacity .45s ease;cursor:pointer}
+.launch.out{opacity:0;pointer-events:none}
+.launch svg{width:124px;height:124px;overflow:visible}
+.launch .house{transform-box:fill-box;transform-origin:center;animation:pop .6s cubic-bezier(.2,1.4,.4,1) both}
+.launch .tick{stroke-dasharray:20;stroke-dashoffset:20;animation:draw .45s .6s ease-out forwards}
+.launch .wm{color:var(--sand);font-size:36px;font-weight:800;letter-spacing:-.01em;opacity:0;animation:rise .5s 1s ease forwards}
+.launch .tg{color:var(--tan);font-size:15px;font-style:italic;opacity:0;animation:rise .5s 1.2s ease forwards}
+@keyframes pop{from{transform:scale(.3);opacity:0}}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+/* small animations */
+.burst{position:absolute;left:50%;top:40%;width:110px;height:110px;margin:-55px 0 0 -55px;color:#fff;pointer-events:none;z-index:5;filter:drop-shadow(0 6px 14px rgba(43,107,79,.5));animation:burst .65s ease forwards}
+.burst path{fill:var(--tint)}
+@keyframes burst{0%{transform:scale(.2);opacity:0}30%{transform:scale(1.15);opacity:1}100%{transform:scale(1.45);opacity:0}}
+.round,.big,.get,.pill,.sbtn,.icbtn{transition:transform .12s ease}
+.round:active,.big:active,.get:active,.pill:active,.sbtn:active,.icbtn:active{transform:scale(.92)}
+.tabbar button[aria-selected="true"] svg{animation:tabpop .3s ease}
+@keyframes tabpop{50%{transform:scale(1.15)}}
+.card.back-in{animation:backin .38s cubic-bezier(.2,.8,.2,1)}
+@keyframes backin{from{transform:translateX(-120%) rotate(-18deg)}}
+.round.undo{width:46px;height:46px;color:#C98A00}
+.round.undo svg{width:20px;height:20px}
+.round.undo.locked{opacity:.55}
+.hdr-btns{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+.hdr-btns .pill{margin:0}
+.icbtn{position:relative;width:32px;height:32px;border-radius:50%;border:0;background:var(--fill);color:var(--tint);display:flex;align-items:center;justify-content:center}
+.icbtn svg{width:18px;height:18px}
+.icbtn .bdot{position:absolute;top:0;right:0;width:10px;height:10px;border-radius:50%;background:var(--red);border:2px solid var(--bg)}
+/* worker profile view */
+.pv-body{flex:1;min-height:0;overflow-y:auto}
+.pv-top{position:relative;height:230px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:22px}
+.pv-top .avatar{width:136px;height:136px;box-shadow:0 6px 18px rgba(0,0,0,.12)}
+.pv-close{position:absolute;top:12px;left:12px;width:34px;height:34px;border-radius:50%;border:0;background:rgba(255,255,255,.85);color:var(--label);display:flex;align-items:center;justify-content:center}
+.pv-close svg{width:14px;height:14px}
+.pv-head{padding:14px 18px 0;display:flex;flex-direction:column;gap:4px}
+.pv-head h2{font-size:28px;margin:0;font-weight:700}
+.pv-head h2 small{font-weight:400;color:var(--label2)}
+.pv-txt{font-size:15px;line-height:1.45;padding:12px 16px}
+.val{margin-left:auto;color:var(--label2);font-size:16px;text-align:right}
+.cellr .chev{margin-left:auto}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;padding:12px 14px}
+.week div{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;color:var(--label2)}
+.week i{width:28px;height:28px;border-radius:50%;background:var(--fill)}
+.week i.on{background:var(--tint)}
+.rev{padding:12px 16px;display:flex;flex-direction:column;gap:3px;font-size:15px;line-height:1.4;position:relative}
+.rev+.rev::before{content:"";position:absolute;top:0;left:16px;right:0;border-top:.5px solid var(--sep)}
+.rev b{font-size:14px;display:flex;justify-content:space-between}
+.rev b em{font-style:normal;font-weight:400;color:var(--label2);font-size:13px}
+.rev .stars{color:#C98A00;font-size:13px;letter-spacing:1px}
+.pv-actions{flex:none;display:flex;gap:10px;padding:10px 16px 30px;background:var(--bg);border-top:.5px solid var(--sep)}
+.pv-actions .big{flex:1}
+.big.ghost{background:var(--cell);color:var(--red)}
+@media (max-width:440px){.pv-actions{padding-bottom:14px}}
+/* filters */
+.fhead{display:flex;justify-content:space-between;align-items:center}
+.fhead button{border:0;background:none;color:var(--tint);font-size:17px;padding:4px}
+.fsec{font-size:13px;color:var(--label2);text-transform:uppercase;letter-spacing:.02em;padding:4px 4px 0}
+.sheet .pick{padding:12px}
+/* account tab */
+.me-card{display:flex;align-items:center;gap:14px;padding:14px 16px}
+.me-card .av{width:60px;height:60px}
+.switch{margin-left:auto;width:51px;height:31px;border-radius:16px;background:#34C759;position:relative;flex:none;border:0;transition:background .2s}
+.switch::after{content:"";position:absolute;top:2px;left:22px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.2);transition:left .2s}
+.switch[aria-checked="false"]{background:#E9E9EA}
+.switch[aria-checked="false"]::after{left:2px}
+.redtxt{color:var(--red)!important;justify-content:center}
+.ver{text-align:center;font-size:12px;color:var(--label2);padding:18px 0 28px}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}.launch .wm,.launch .tg{opacity:1}.launch .tick{stroke-dashoffset:0}}
 </style>
 
 <div class="caption">
   <b><span class="appicon"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M5 15 16 6l11 9v11a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V15Z" fill="#1F4D3A"/><path d="m11 18 3.6 3.6L21 15" stroke="#EFE6D6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Homely</b>
-  <span id="hint">Swipe right to save a worker, then message and hire them.</span>
+  <span id="hint">Swipe right to save a worker. Tap a card to see the full profile.</span>
 </div>
 <div class="mode" aria-label="Demo view">
   <button type="button" id="modeHire" aria-pressed="true">I'm hiring</button>
@@ -270,9 +343,10 @@ button.cellr:active{background:#E5E5EA}
   <div class="main" id="main">
    <!-- Discover -->
    <div class="scr" id="sDiscover">
-    <div class="lt"><h1 class="brandhead" aria-label="Homely"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M5 15 16 6l11 9v11a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V15Z" fill="#1F4D3A"/><path d="m11 18 3.6 3.6L21 15" stroke="#EFE6D6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Homely</span></h1><button class="pill" id="premBtn" type="button"></button></div>
+    <div class="lt"><h1 class="brandhead" aria-label="Homely"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M5 15 16 6l11 9v11a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V15Z" fill="#1F4D3A"/><path d="m11 18 3.6 3.6L21 15" stroke="#EFE6D6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Homely</span></h1><div class="hdr-btns"><button class="icbtn" id="filterBtn" type="button" aria-label="Filters"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2.2"/><circle cx="10" cy="17" r="2.2"/></svg><span class="bdot" id="fdot" hidden></span></button><button class="pill" id="premBtn" type="button"></button></div></div>
     <div class="deck" id="deck"></div>
     <div class="actions">
+     <button class="round undo" id="undoBtn" type="button" aria-label="Undo last swipe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h11a5 5 0 0 1 0 10H9"/><path d="M8 5 4 9l4 4"/></svg></button>
      <button class="round no" id="noBtn" type="button" aria-label="Pass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
      <button class="round yes" id="yesBtn" type="button" aria-label="Save"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-9.6-9.3C1 8.4 3 5 6.4 5c2 0 3.4 1.1 4.1 2.2h3c.7-1.1 2.1-2.2 4.1-2.2C21 5 23 8.4 21.6 11.7 19.5 16.4 12 21 12 21Z"/></svg></button>
     </div>
@@ -282,10 +356,14 @@ button.cellr:active{background:#E5E5EA}
    <div class="scr" id="sMessages" hidden><div class="scroll"><div class="lt"><h1>Messages</h1></div><div id="msgList"></div></div></div>
    <!-- Saved -->
    <div class="scr" id="sSaved" hidden><div class="scroll"><div class="lt"><h1>Saved</h1></div><div id="savedList"></div></div></div>
+   <!-- Profile tab -->
+   <div class="scr" id="sProfile" hidden><div class="scroll"><div class="lt"><h1>Profile</h1></div><div id="acct"></div></div></div>
    <!-- Chat (pushed) -->
    <div class="scr" id="sChat" hidden></div>
    <!-- Worker onboarding -->
    <div class="scr" id="sWorker" hidden></div>
+   <!-- Worker profile view (pushed) -->
+   <div class="scr" id="sWP" hidden></div>
   </div>
 
   <nav class="tabbar" id="tabbar" role="tablist">
@@ -295,10 +373,13 @@ button.cellr:active{background:#E5E5EA}
     <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M14 4.5c5.8 0 10 3.7 10 8.4s-4.2 8.4-10 8.4c-1.1 0-2.2-.1-3.2-.4L5.5 23l1.3-4.3C5 17.2 4 15.2 4 12.9c0-4.7 4.2-8.4 10-8.4Z" fill="currentColor" fill-opacity=".15"/></svg>Messages<span class="badge" id="badge" hidden></span></button>
    <button role="tab" type="button" data-tab="Saved" aria-selected="false">
     <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M14 23.5s-8.5-5.1-10.4-10.3C2.4 9.6 4.6 6 8.3 6c2.4 0 4.2 1.4 5.7 3.3C15.5 7.4 17.3 6 19.7 6c3.7 0 5.9 3.6 4.7 7.2C22.5 18.4 14 23.5 14 23.5Z" fill="currentColor" fill-opacity=".15"/></svg>Saved</button>
+   <button role="tab" type="button" data-tab="Profile" aria-selected="false">
+    <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><circle cx="14" cy="10" r="4.5" fill="currentColor" fill-opacity=".15"/><path d="M5.5 23.5c.8-4.6 4.2-7.5 8.5-7.5s7.7 2.9 8.5 7.5Z" fill="currentColor" fill-opacity=".15"/></svg>Profile</button>
   </nav>
   <div class="homebar"></div>
   <div id="overlay"></div>
   <div id="bannerHost"></div>
+  <div class="launch" id="launch"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path class="house" d="M5 15 16 6l11 9v11a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V15Z" fill="#EFE6D6"/><path class="tick" d="m11 18 3.6 3.6L21 15" stroke="#1F4D3A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="wm">Homely</div><div class="tg">Trusted help, one swipe away.</div></div>
  </div>
 </div>
 <div class="demo-note">Class demo for a business plan. All workers, brands and messages are fictional, and no payments are made.</div>
@@ -322,7 +403,23 @@ const W=[
  {n:'Patricia',a:44,area:'Álvaro Obregón',y:14,av:'Entrada por salida',sk:['Cooking','Childcare','Cleaning'],ref:3,bio:'Former cook at a small restaurant. Plans the weekly menu and does the shopping. Great with teenagers.'},
  {n:'Silvia',a:56,area:'Iztapalapa',y:25,av:'Full-time',sk:['Cleaning','Cooking','Elder care'],ref:4,bio:'Twenty-five years in family homes in Polanco and Lomas. Can live in. Strong references from two families.'},
  {n:'Daniela',a:26,area:'Benito Juárez',y:4,av:'Part-time',sk:['Childcare','Cleaning','English basics'],ref:2,bio:'Studying early education at night. Picks kids up from school and helps with basic English homework.'}
-].map((w,i)=>({...w,id:i,tone:TONES[i%TONES.length],ini:initials(w.n)}));
+].map((w,i)=>({...w,id:i,tone:TONES[i%TONES.length],ini:initials(w.n),hair:[1,0,4,2,3,0,5,2,1,3][i],
+  r:[4.9,4.8,5.0,4.7,4.9,4.8,4.6,4.9,5.0,4.7][i],rc:[31,18,46,9,27,15,12,22,58,6][i],km:[5.1,14.8,21.3,2.4,9.6,13.2,15.6,6.8,22.7,11.9][i]}));
+W[6].days=[0,0,0,0,0,1,1];
+const DAYS={'Full-time':[1,1,1,1,1,1,0],'Part-time':[1,0,1,0,1,0,0],'Entrada por salida':[1,1,1,1,1,0,0]};
+const AREA_KM={'Álvaro Obregón':5.8,'Benito Juárez':12.1,'Coyoacán':13.5,'Cuajimalpa':2.9,'Iztapalapa':21.8,'Magdalena Contreras':9.9,'Miguel Hidalgo':8.4,'Tlalpan':15.1};
+const HAIR=[
+ '<path d="M33 42C31 25 40 20 50 20s19 5 17 22l3 24c-6 3-12 1-15-3H45c-3 4-9 6-15 3Z"/>',
+ '<circle cx="50" cy="23" r="7.5"/><path d="M34 38c0-10 7-15 16-15s16 5 16 15c-5-6-27-6-32 0Z"/>',
+ '<path d="M34 38c0-10 7-15 16-15s16 5 16 15c-5-6-27-6-32 0Z"/><path d="M63 30c11 3 13 18 7 28-2-8-4-15-9-21Z"/>',
+ '<circle cx="37" cy="31" r="8"/><circle cx="45" cy="25" r="8"/><circle cx="55" cy="25" r="8"/><circle cx="63" cy="31" r="8"/><circle cx="33" cy="41" r="6"/><circle cx="67" cy="41" r="6"/>',
+ '<path d="M32 44c-2-16 6-23 18-23s20 7 18 23l-1 8c-3 1-6 0-7-2V38H40v12c-1 2-4 3-7 2Z"/>',
+ '<path d="M34 38c0-11 7-16 16-16s16 5 16 16c-4-5-10-7-16-7s-12 2-16 7Z"/>'
+];
+function sil(w){return `<svg viewBox="0 0 100 100" aria-hidden="true"><g fill="#1F4D3A" opacity=".82">${HAIR[w.hair||0]}<circle cx="50" cy="40" r="16"/><rect x="44" y="52" width="12" height="14" rx="4"/><path d="M15 106C15 81 31 69 50 69S85 81 85 106Z"/></g></svg>`}
+function rateHTML(w,long){return (w.r?`<span class="star">★ ${w.r.toFixed(1)}</span><span>(${w.rc}${long?' reviews':''})</span>`:'<span class="star">★ New</span>')+(long?'':`<span>·</span><span>${w.km} km away</span>`)}
+const RV={Cleaning:'Always on time, and the house has never looked this good.',Cooking:'Amazing cooking. The whole family loves the food.',Childcare:'Patient and caring with the kids. We felt safe from day one.','Elder care':'So kind and patient with my mom. Highly recommend.',Ironing:'Very careful with clothes, even the delicate ones.',Gardening:'The garden looks better than ever.','Pet care':'Our dogs are always happy after their walks.',Laundry:'Laundry done perfectly every single week.',Organizing:'Our closets finally make sense.',Repairs:'Fixes small things around the house quickly.','English basics':'Helps our son with his English homework every afternoon.'};
+const RN=['Ana P.','Familia Gómez','Jorge M.','Paola R.','Sofía T.','Ricardo V.'];
 function initials(n){return n.split(' ').filter(Boolean).map(s=>s[0]).slice(0,2).join('').toUpperCase()}
 const first=w=>w.n.split(' ')[0];
 const byId=id=>W.find(w=>w.id===id);
@@ -335,7 +432,8 @@ const PARTNERS=[
 ];
 
 // state
-let premium=false, used=0, idx=0;
+let premium=false, used=0, seen=new Set(), hist=[], undoTop=null, notif=true;
+let filt={av:'All',areas:[],sk:[]};
 const status={};   // id -> saved | hired | paused
 const chats={};    // id -> [{f:'me'|'them'|'sys', t}]
 const unread=new Set();
@@ -344,7 +442,7 @@ let tabNow='Discover', chatId=null, chatFrom='Messages';
 const gotCodes=new Set();
 
 // seed one existing conversation so the app feels lived-in
-(function seed(){
+function seed(){
   const r=W[1]; status[r.id]='saved'; savedOrder.push(r.id);
   chats[r.id]=[
    {f:'sys',t:'<b>You saved Rosa Elena</b> · Yesterday'},
@@ -352,63 +450,80 @@ const gotCodes=new Set();
    {f:'them',t:'Hi! Yes, I\'m available entrada por salida, from 8 to 6. How old are your kids?'}
   ];
   unread.add(r.id);
-})();
-let deck=W.filter(w=>!status[w.id]);
+}
+seed();
+let deck=[];
+function match(w,f){f=f||filt;
+  if(f.av!=='All'&&w.av!==f.av) return false;
+  if(f.areas.length&&!f.areas.includes(w.area)) return false;
+  if(f.sk.length&&!f.sk.some(x=>w.sk.includes(x))) return false;
+  return true}
+const filtOn=()=>filt.av!=='All'||filt.areas.length||filt.sk.length;
+function pool(f){const k=w=>w.id===undoTop?2:(w.fresh?1:0);
+  return W.filter(w=>!seen.has(w.id)&&!status[w.id]&&match(w,f)).sort((a,b)=>k(b)-k(a))}
 
 /* ---------- Discover ---------- */
 function cardHTML(w){return `
  <div class="photo" style="background:${w.tone}">
    <div class="vbadge">${CHECK}Verified</div><div class="avail">${esc(w.av)}</div>
-   <div class="avatar">${esc(w.ini)}</div>
+   <div class="avatar">${sil(w)}</div>
    <div class="stamp like">SAVE</div><div class="stamp nope">PASS</div>
  </div>
  <div class="info">
    <div class="name">${esc(w.n)} <small>${w.a}</small></div>
    <div class="meta">${esc(w.area)} · ${w.y} years of experience</div>
+   <div class="rate">${rateHTML(w)}</div>
    <div class="chips">${w.sk.map(s=>`<span class="chip">${esc(s)}</span>`).join('')}</div>
    <div class="bio">${esc(w.bio)}</div>
    <div class="checks"><span>${CHECK}Official ID</span><span>${CHECK}Background check</span><span>${CHECK}${w.ref} references</span></div>
  </div>`}
 
-function renderDeck(){
+function renderDeck(backIn){
   const d=$('deck'); d.innerHTML='';
-  const rest=deck.length-idx;
+  deck=pool(); const rest=deck.length;
   if(rest<=0){
-    d.innerHTML=`<div class="empty"><h3>You're all caught up</h3><p>New verified workers join every week in your area.</p><button class="big" id="again" type="button" style="width:auto;padding:0 22px;margin-top:8px">Start over</button></div>`;
-    $('again').onclick=()=>{deck=W.filter(w=>!status[w.id]);idx=0;used=premium?used:0;renderDeck()};
+    d.innerHTML=filtOn()?`<div class="empty"><h3>No workers match your filters</h3><p>Try a different availability, area or skill.</p><button class="big" id="again" type="button" style="width:auto;padding:0 22px;margin-top:8px">Clear Filters</button></div>`
+     :`<div class="empty"><h3>You're all caught up</h3><p>New verified workers join every week in your area.</p><button class="big" id="again" type="button" style="width:auto;padding:0 22px;margin-top:8px">Start over</button></div>`;
+    $('again').onclick=()=>{if(filtOn()){filt={av:'All',areas:[],sk:[]}}else{seen=new Set();hist=[]}renderDeck()};
   } else {
-    [1,0].forEach(o=>{const w=deck[idx+o]; if(!w) return;
-      const c=document.createElement('div'); c.className='card'+(o?' under':''); c.innerHTML=cardHTML(w); d.appendChild(c); if(!o) drag(c);});
+    [1,0].forEach(o=>{const w=deck[o]; if(!w) return;
+      const c=document.createElement('div'); c.className='card'+(o?' under':(backIn?' back-in':'')); c.innerHTML=cardHTML(w); d.appendChild(c); if(!o) drag(c,w);});
   }
   $('noBtn').disabled=$('yesBtn').disabled=rest<=0;
+  $('undoBtn').classList.toggle('locked',!premium);
+  $('fdot').hidden=!filtOn();
   $('left').textContent=premium?'Premium · unlimited swipes':`${Math.max(0,FREE-used)} free swipes left today`;
   const pb=$('premBtn');
   pb.innerHTML=premium?'<svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 12h12l1-7-4 3-3-5-3 5-4-3 1 7Z"/></svg>Premium':'Free plan';
   pb.classList.toggle('on',premium);
 }
-function drag(c){
+function drag(c,w){
   let sx=0,sy=0,dx=0,dy=0,down=false;const like=c.querySelector('.like'),nope=c.querySelector('.nope');
   const under=()=>$('deck').querySelector('.card.under');
-  c.addEventListener('pointerdown',e=>{down=true;sx=e.clientX;sy=e.clientY;c.setPointerCapture(e.pointerId);c.classList.remove('anim');const u=under();if(u)u.style.transition='none'});
+  c.addEventListener('pointerdown',e=>{down=true;dx=dy=0;sx=e.clientX;sy=e.clientY;c.setPointerCapture(e.pointerId);c.classList.remove('anim');const u=under();if(u)u.style.transition='none'});
   c.addEventListener('pointermove',e=>{if(!down)return;dx=e.clientX-sx;dy=e.clientY-sy;
     c.style.transform=`translate(${dx}px,${dy*.3}px) rotate(${dx/18}deg)`;
     like.style.opacity=Math.max(0,Math.min(1,dx/90));nope.style.opacity=Math.max(0,Math.min(1,-dx/90));
     const u=under();if(u){const k=Math.min(1,Math.abs(dx)/150);u.style.transform=`scale(${.95+.05*k}) translateY(${10*(1-k)}px)`}});
   const end=()=>{if(!down)return;down=false;
     const u=under();if(u)u.style.transition='';
+    if(Math.abs(dx)<6&&Math.abs(dy)<6){if(u)u.style.transform='';c.style.transform='';dx=dy=0;openProfile(w,'deck');return}
     if(Math.abs(dx)>100) swipe(dx>0); else {c.classList.add('anim');c.style.transform='';like.style.opacity=nope.style.opacity=0;if(u)u.style.transform=''}
     dx=dy=0};
   c.addEventListener('pointerup',end);c.addEventListener('pointercancel',end);
 }
 function swipe(right){
-  if(idx>=deck.length) return;
+  if(!deck.length) return;
   const c=$('deck').querySelector('.card:not(.under)'), u=$('deck').querySelector('.card.under');
   if(!premium&&used>=FREE){ if(c){c.classList.add('anim');c.style.transform='';c.querySelectorAll('.stamp').forEach(s=>s.style.opacity=0)} if(u){u.style.transition='';u.style.transform=''} paywall(); return }
   if(u){u.style.transition='';u.style.transform='none'}
-  const w=deck[idx];
+  const w=deck[0];
   if(c){c.classList.add('anim');c.style.transform=`translate(${right?520:-520}px,40px) rotate(${right?24:-24}deg)`;c.style.opacity=0;c.querySelector(right?'.like':'.nope').style.opacity=1}
-  used++; idx++;
+  used++; seen.add(w.id); hist.push({id:w.id,right}); if(undoTop===w.id) undoTop=null;
   if(right){
+    const b=document.createElementNS('http://www.w3.org/2000/svg','svg'); b.setAttribute('viewBox','0 0 24 24'); b.setAttribute('class','burst');
+    b.innerHTML='<path d="M12 21s-7.5-4.6-9.6-9.3C1 8.4 3 5 6.4 5c2 0 3.4 1.1 4.1 2.2h3c.7-1.1 2.1-2.2 4.1-2.2C21 5 23 8.4 21.6 11.7 19.5 16.4 12 21 12 21Z"/>';
+    $('deck').appendChild(b); setTimeout(()=>b.remove(),700);
     status[w.id]='saved'; savedOrder.unshift(w.id);
     chats[w.id]=[{f:'sys',t:`<b>You saved ${esc(w.n)}</b> · Today<br>Say hi to ask about availability or set up an interview.`}];
     banner('Homely',`${first(w)} was added to Saved. Say hi in Messages.`);
@@ -416,6 +531,17 @@ function swipe(right){
   setTimeout(renderDeck,260);
 }
 $('noBtn').onclick=()=>swipe(false); $('yesBtn').onclick=()=>swipe(true);
+function undo(){
+  if(!premium){paywall('undo');return}
+  const h=hist[hist.length-1];
+  if(!h){banner('Homely','Nothing to undo yet.');return}
+  if(h.right&&status[h.id]&&status[h.id]!=='saved'){banner('Homely','You already hired or reported this worker, so that swipe can\'t be undone.');return}
+  hist.pop(); seen.delete(h.id);
+  if(h.right){delete status[h.id];savedOrder=savedOrder.filter(x=>x!==h.id);delete chats[h.id];unread.delete(h.id);updBadge()}
+  undoTop=h.id; renderDeck(true);
+}
+$('undoBtn').onclick=undo;
+$('filterBtn').onclick=filterSheet;
 $('premBtn').onclick=()=>{premium?banner('Homely','You\'re on Premium: unlimited swipes.'):paywall()};
 
 /* ---------- Messages & Saved ---------- */
@@ -427,7 +553,7 @@ function lastLine(id){
 function renderMessages(){
   const ids=savedOrder.filter(id=>chats[id]);
   $('msgList').innerHTML=ids.length?`<div class="group">${ids.map(id=>{const w=byId(id);const u=unread.has(id);
-    return `<button class="cellr" type="button" data-chat="${id}" style="--inset:74px"><div class="av" style="background:${w.tone}">${esc(w.ini)}</div>
+    return `<button class="cellr" type="button" data-chat="${id}" style="--inset:74px"><div class="av" style="background:${w.tone}">${sil(w)}</div>
      <div class="ct"><b>${esc(w.n)}</b><span class="${u?'unread':''}">${lastLine(id).replace(/<[^>]+>/g,'')}</span></div>
      <span class="time">${u?'<span class="dot"></span>':''}${id===1?'Yesterday':'Now'}</span></button>`}).join('')}</div>`
    :`<div class="empty" style="position:static;padding-top:80px"><h3>No messages yet</h3><p>Save a worker on Discover to start a conversation.</p></div>`;
@@ -437,7 +563,7 @@ function renderMessages(){
 function renderSaved(){
   const rows=savedOrder.map(id=>{const w=byId(id);const s=status[id];
     const tag=s==='hired'?'<span class="tag ok">Hired</span>':s==='paused'?'<span class="tag paused">Paused</span>':'';
-    return `<button class="cellr" type="button" data-chat="${id}" style="--inset:74px"><div class="av" style="background:${w.tone}">${esc(w.ini)}</div>
+    return `<button class="cellr" type="button" data-chat="${id}" style="--inset:74px"><div class="av" style="background:${w.tone}">${sil(w)}</div>
      <div class="ct"><b>${esc(w.n)}, ${w.a}</b><span>${esc(w.av)} · ${esc(w.area)}</span></div>${tag}${CHEV}</button>`}).join('');
   $('savedList').innerHTML=
    `<div class="sec">Your workers</div>`+(rows?`<div class="group">${rows}</div>`:`<div class="group"><div class="cellr" style="color:var(--label2);font-size:15px">Swipe right on Discover to save workers.</div></div>`)+
@@ -480,7 +606,7 @@ function renderChat(focusInput){
   const thread=m.map((x,i)=>x.f==='sys'?`<div class="sys">${x.t}</div>`:`<div class="bub ${x.f}">${esc(x.t)}</div>${i===lastMe&&i===m.length-1?'<div class="read">Delivered</div>':''}`).join('');
   $('sChat').innerHTML=`
    <div class="nav"><button class="back" type="button" id="cBack"><svg viewBox="0 0 12 20" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2 2 10l8 8"/></svg>${chatFrom}</button>
-    <div class="who"><div class="av sm" style="background:${w.tone}">${esc(w.ini)}</div><div class="nm">${esc(w.n)}</div><div class="vf">${s==='paused'?'Under review':'✓ Verified'}</div></div>
+    <div class="who" id="cWho" role="button" tabindex="0" style="cursor:pointer"><div class="av sm" style="background:${w.tone}">${sil(w)}</div><div class="nm">${esc(w.n)}</div><div class="vf">${s==='paused'?'Under review':'✓ Verified'}</div></div>
     <button class="more" type="button" id="cMore" aria-label="More"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button></div>
    ${strip}
    <div class="thread" id="thread">${thread}</div>
@@ -490,6 +616,7 @@ function renderChat(focusInput){
   const th=$('thread'); th.scrollTop=th.scrollHeight;
   $('cBack').onclick=closeChat;
   $('cMore').onclick=()=>actionSheet(w);
+  $('cWho').onclick=()=>openProfile(w,'chat');
   if($('cHire')) $('cHire').onclick=()=>hireSheet(w);
   if($('cReport')) $('cReport').onclick=()=>reportSheet(w);
   const inp=$('cInput');
@@ -520,23 +647,26 @@ function actionSheet(w){
   const s=status[w.id];
   overlay(`<div class="asheet"><div class="agroup"><div class="ah">${esc(w.n)}</div>
     ${s==='saved'?`<button type="button" id="aHire">Hire ${esc(first(w))}</button>`:''}
-    <button type="button" id="aProfile">View verification</button>
+    <button type="button" id="aProfile">View Profile</button>
     ${s!=='paused'?`<button type="button" class="red" id="aReport">Report a concern</button>`:''}</div>
     <div class="agroup"><button type="button" class="bold" id="aCancel">Cancel</button></div></div>`);
   if($('aHire')) $('aHire').onclick=()=>hireSheet(w);
   if($('aReport')) $('aReport').onclick=()=>reportSheet(w);
-  $('aProfile').onclick=()=>{closeOv();banner('Homely',`${first(w)}: official ID, background check and ${w.ref} references verified.`)};
+  $('aProfile').onclick=()=>{closeOv();openProfile(w,'chat')};
   $('aCancel').onclick=closeOv;
 }
-function paywall(){
-  overlay(`<div class="sheet"><div class="grab"></div><h3>You've used your ${FREE} free swipes today</h3>
-   <p>Upgrade to keep browsing verified workers now, or come back tomorrow.</p>
+function paywall(why){
+  const H=why==='undo'?['Undo is a Premium feature','Bring back the last worker you swiped on, plus unlimited swipes.']
+   :why==='upgrade'?['Homely Premium','Unlimited swipes and more ways to find the right person.']
+   :[`You've used your ${FREE} free swipes today`,'Upgrade to keep browsing verified workers now, or come back tomorrow.'];
+  overlay(`<div class="sheet"><div class="grab"></div><h3>${H[0]}</h3>
+   <p>${H[1]}</p>
    <div class="price">$${PREMIUM} MXN <small>/ month</small></div>
-   <div class="group">${['Unlimited swipes','See who\'s available this week first','Priority support from Trust & Safety'].map(f=>`<div class="cellr feat">${CHECK}${esc(f)}</div>`).join('')}</div>
+   <div class="group">${['Unlimited swipes','Undo your last swipe','See who\'s available this week first','Priority support from Trust & Safety'].map(f=>`<div class="cellr feat">${CHECK}${esc(f)}</div>`).join('')}</div>
    <button class="big" type="button" id="goPrem">Start Premium</button>
    <button class="big plain" type="button" id="later">Not now</button>
    <div class="fine">Demo only, no payment is made. Homely is always free for workers.</div></div>`);
-  $('goPrem').onclick=()=>{premium=true;closeOv();renderDeck();banner('Homely','Welcome to Premium. Unlimited swipes are on.')};
+  $('goPrem').onclick=()=>{premium=true;closeOv();renderDeck();if(tabNow==='Profile')renderAccount();banner('Homely','Welcome to Premium. Unlimited swipes are on.')};
   $('later').onclick=closeOv;
 }
 function hireSheet(w){
@@ -563,7 +693,7 @@ function reportSheet(w){
   $('dim').querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{pick=+b.dataset.r;$('dim').querySelectorAll('[data-r]').forEach(x=>x.setAttribute('aria-checked',x===b));$('rSend').disabled=false});
   $('rSend').onclick=()=>{status[w.id]='paused';
     (chats[w.id]=chats[w.id]||[]).push({f:'sys',t:`<b>Report sent</b> · ${esc(R[pick])}<br>${esc(first(w))}'s profile is paused while Trust &amp; Safety reviews it.`});
-    deck=deck.filter((x,i)=>i<idx||x.id!==w.id);
+    renderDeck();
     closeOv();refresh();banner('Homely Trust & Safety','We received your report and will reply within 24 hours.')};
   $('rNo').onclick=closeOv;
 }
@@ -576,16 +706,17 @@ function banner(title,text){
 }
 
 /* ---------- Tabs ---------- */
+const TABS=['Discover','Messages','Saved','Profile'];
 function showTab(t){
   tabNow=t;
-  ['Discover','Messages','Saved'].forEach(x=>$('s'+x).hidden=x!==t);
+  TABS.forEach(x=>$('s'+x).hidden=x!==t);
   document.querySelectorAll('#tabbar button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));
-  if(t==='Messages')renderMessages(); if(t==='Saved')renderSaved();
+  if(t==='Messages')renderMessages(); if(t==='Saved')renderSaved(); if(t==='Profile')renderAccount();
 }
 document.querySelectorAll('#tabbar button').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'&&$('overlay').innerHTML){closeOv();return}
-  if($('overlay').innerHTML||$('sDiscover').hidden||chatId!==null||!$('sWorker').hidden) return;
+  if($('overlay').innerHTML||$('sDiscover').hidden||chatId!==null||!$('sWorker').hidden||!$('sWP').hidden) return;
   if(e.target.tagName==='INPUT') return;
   if(e.key==='ArrowRight')swipe(true); if(e.key==='ArrowLeft')swipe(false);
 });
@@ -602,7 +733,8 @@ const IC={
 };
 const VSTEPS=[['id','Official ID','INE or passport','Upload'],['selfie','Selfie Check','Confirms the ID is you','Start'],['refs','References','2 previous employers','Add'],['bg','Background Check','Third-party provider','Accept']];
 let ws=0, vdone=new Set(), vbusy=null;
-let me={n:'Lucía Hernández',a:31,y:6,area:'Tlalpan',av:'Entrada por salida',sk:['Cleaning','Cooking','Childcare']};
+const ME0={n:'Lucía Hernández',a:31,y:6,area:'Tlalpan',av:'Entrada por salida',sk:['Cleaning','Cooking','Childcare']};
+let me={...ME0,sk:[...ME0.sk]};
 const prog=()=>`<div class="progress">${[0,1,2,3].map(i=>`<i class="${i<=ws?'on':''}"></i>`).join('')}</div>`;
 function wnav(left){return `<div class="wnav">${left?`<button class="back" type="button" id="wBack"><svg viewBox="0 0 12 20" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2 2 10l8 8"/></svg>Back</button>`:'<span></span>'}<span class="stepn">Step ${ws+1} of 4</span></div>${prog()}`}
 function wrender(){
@@ -646,20 +778,122 @@ function wrender(){
   }
 }
 function golive(){
-  const w={n:me.n,a:me.a,area:me.area,y:me.y,av:me.av,sk:me.sk.slice(0,3),ref:2,id:Date.now(),tone:'#C8D5C4',ini:initials(me.n),
+  const w={n:me.n,a:me.a,area:me.area,y:me.y,av:me.av,sk:me.sk.slice(0,3),ref:2,id:Date.now(),tone:'#C8D5C4',ini:initials(me.n),hair:0,r:null,rc:0,km:AREA_KM[me.area]||8,fresh:true,
     bio:`New on Homely. ${me.y} years of experience in family homes, looking for ${me.av.toLowerCase()} work in ${me.area}.`};
-  me.id=w.id; W.push(w); deck.splice(idx,0,w); renderDeck();
+  me.id=w.id; W.push(w); renderDeck();
 }
 function setMode(m){
   const work=m==='work';
   $('modeHire').setAttribute('aria-pressed',!work); $('modeWork').setAttribute('aria-pressed',work);
   closeOv(); $('bannerHost').innerHTML='';
-  $('hint').textContent=work?'Sign up as a domestic worker and go through verification.':'Swipe right to save a worker, then message and hire them.';
-  if(work){ $('sChat').hidden=true; chatId=null; ['Discover','Messages','Saved'].forEach(x=>$('s'+x).hidden=true); $('tabbar').hidden=true; $('sWorker').hidden=false; wrender(); }
+  $('hint').textContent=work?'Sign up as a domestic worker and go through verification.':'Swipe right to save a worker. Tap a card to see the full profile.';
+  $('sWP').hidden=true;
+  if(work){ $('sChat').hidden=true; chatId=null; TABS.forEach(x=>$('s'+x).hidden=true); $('tabbar').hidden=true; $('sWorker').hidden=false; wrender(); }
   else { $('sWorker').hidden=true; $('tabbar').hidden=false; showTab('Discover'); }
 }
 $('modeHire').onclick=()=>setMode('hire'); $('modeWork').onclick=()=>setMode('work');
 
-renderDeck(); updBadge();
+/* ---------- Full worker profile ---------- */
+function openProfile(w,from){
+  const d=w.days||DAYS[w.av]||[1,1,1,1,1,0,0];
+  const revs=w.rc?w.sk.slice(0,2).map((x,i)=>`<div class="rev"><b>${RN[(w.id+i)%RN.length]}<em>${i?'Oct 2026':'Nov 2026'}</em></b><span class="stars">★★★★★</span>${esc(RV[x]||'Great experience, highly recommend.')}</div>`).join('')
+   :'<div class="rev" style="color:var(--label2)">No reviews yet. Reviews appear after the first hire through Homely.</div>';
+  const S=$('sWP');
+  S.innerHTML=`<div class="pv-body">
+   <div class="pv-top" style="background:${w.tone}"><button class="pv-close" id="pvClose" type="button" aria-label="Close"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M2 2l10 10M12 2 2 12"/></svg></button>
+    <div class="vbadge" style="left:auto;right:12px">${CHECK}Verified</div><div class="avatar">${sil(w)}</div></div>
+   <div class="pv-head"><h2>${esc(w.n)} <small>${w.a}</small></h2><div class="meta">${esc(w.area)} · ${w.km} km away</div><div class="rate">${rateHTML(w,true)}</div></div>
+   <div class="sec">About</div><div class="group"><div class="pv-txt">${esc(w.bio)}</div></div>
+   <div class="sec">Details</div><div class="group">
+    <div class="cellr">Availability<span class="val">${esc(w.av)}</span></div>
+    <div class="cellr">Experience<span class="val">${w.y} years</span></div>
+    <div class="cellr">Skills<span class="val">${w.sk.map(esc).join(', ')}</span></div></div>
+   <div class="sec">Usual week</div><div class="group"><div class="week">${['M','T','W','T','F','S','S'].map((l,i)=>`<div><i class="${d[i]?'on':''}"></i>${l}</div>`).join('')}</div></div>
+   <div class="sec">Verification</div><div class="group">${[['Official ID (INE)','Verified'],['Selfie check','Verified'],['Background check','Clear'],[`${w.ref} references`,'Confirmed']].map(([a,b])=>`<div class="cellr" style="--inset:58px"><div class="ib">${CHECK}</div><div class="ct"><b>${a}</b></div><span class="val" style="font-size:15px;color:var(--tint);font-weight:600">${b}</span></div>`).join('')}</div>
+   <div class="sec">Reviews</div><div class="group">${revs}</div><div style="height:24px"></div></div>
+   <div class="pv-actions">${from==='deck'?`<button class="big ghost" id="pvNo" type="button">Pass</button><button class="big" id="pvYes" type="button">Save</button>`:`<button class="big" id="pvBack" type="button">Back to Chat</button>`}</div>`;
+  S.hidden=false; S.classList.remove('push'); void S.offsetWidth; S.classList.add('push');
+  $('tabbar').hidden=true;
+  $('pvClose').onclick=closeProfile;
+  if($('pvNo')) $('pvNo').onclick=()=>{closeProfile();setTimeout(()=>swipe(false),120)};
+  if($('pvYes')) $('pvYes').onclick=()=>{closeProfile();setTimeout(()=>swipe(true),120)};
+  if($('pvBack')) $('pvBack').onclick=closeProfile;
+}
+function closeProfile(){$('sWP').hidden=true; if(chatId===null&&$('sWorker').hidden) $('tabbar').hidden=false}
+
+/* ---------- Filters ---------- */
+function filterSheet(){
+  const f={av:filt.av,areas:[...filt.areas],sk:[...filt.sk]};
+  const AVL=[['All','All'],['Full-time','Full-time'],['Part-time','Part-time'],['Entrada por salida','Entrada/salida']];
+  const AR=[...new Set(W.map(w=>w.area))].sort((a,b)=>a.localeCompare(b));
+  const SK=['Cleaning','Cooking','Childcare','Ironing','Elder care','Pet care','Gardening'];
+  overlay(`<div class="sheet"><div class="grab"></div>
+   <div class="fhead"><button type="button" id="fClear">Clear</button><h3 style="margin:0">Filters</h3><button type="button" id="fDone" style="font-weight:600">Done</button></div>
+   <div class="fsec">Availability</div><div class="group"><div class="cellr"><div class="seg" id="fAv">${AVL.map(([v,l])=>`<button type="button" data-v="${v}" aria-pressed="${v===f.av}">${l}</button>`).join('')}</div></div></div>
+   <div class="fsec">Alcaldía</div><div class="group"><div class="pick" id="fAr">${AR.map(a=>`<button type="button" data-v="${esc(a)}" aria-pressed="${f.areas.includes(a)}">${esc(a)}</button>`).join('')}</div></div>
+   <div class="fsec">Skills</div><div class="group"><div class="pick" id="fSk">${SK.map(a=>`<button type="button" data-v="${a}" aria-pressed="${f.sk.includes(a)}">${a}</button>`).join('')}</div></div>
+   <button class="big" type="button" id="fShow"></button></div>`);
+  const upd=()=>{
+    $('fAv').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===f.av));
+    $('fAr').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',f.areas.includes(b.dataset.v)));
+    $('fSk').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',f.sk.includes(b.dataset.v)));
+    const n=pool(f).length; $('fShow').textContent=n?`Show ${n} worker${n===1?'':'s'}`:'No workers match';
+  };
+  const tog=(arr,v)=>{const i=arr.indexOf(v);i<0?arr.push(v):arr.splice(i,1)};
+  $('fAv').querySelectorAll('button').forEach(b=>b.onclick=()=>{f.av=b.dataset.v;upd()});
+  $('fAr').querySelectorAll('button').forEach(b=>b.onclick=()=>{tog(f.areas,b.dataset.v);upd()});
+  $('fSk').querySelectorAll('button').forEach(b=>b.onclick=()=>{tog(f.sk,b.dataset.v);upd()});
+  $('fClear').onclick=()=>{f.av='All';f.areas=[];f.sk=[];upd()};
+  const apply=()=>{filt=f;closeOv();renderDeck()};
+  $('fDone').onclick=apply; $('fShow').onclick=apply;
+  upd();
+}
+
+/* ---------- Profile tab ---------- */
+function renderAccount(){
+  const hires=Object.values(status).filter(x=>x==='hired').length;
+  $('acct').innerHTML=`<div class="group"><div class="me-card"><div class="av" style="background:#DCCFB0">${sil({hair:5})}</div><div class="ct"><b style="font-size:20px">Carlos H.</b><span>Employer account · Santa Fe, CDMX</span></div></div></div>
+   <div class="sec">Plan</div><div class="group"><div class="cellr">${premium?'Homely Premium':'Free plan'}<span class="val">${premium?'$'+PREMIUM+' MXN / month':FREE+' swipes a day'}</span></div>
+    ${premium?'':`<button class="cellr" type="button" id="upg" style="color:var(--tint);font-weight:600">Upgrade to Premium${CHEV}</button>`}</div>
+   <div class="sec">Activity</div><div class="group"><div class="cellr">Saved workers<span class="val">${savedOrder.length}</span></div><div class="cellr">Hires through Homely<span class="val">${hires}</span></div></div>
+   <div class="sec">Settings</div><div class="group">
+    <div class="cellr">Notifications<button class="switch" id="notif" type="button" role="switch" aria-checked="${notif}" aria-label="Notifications"></button></div>
+    <div class="cellr">Search area<span class="val">Santa Fe, CDMX</span></div>
+    <button class="cellr" type="button" id="privacy">Privacy notice${CHEV}</button>
+    <button class="cellr" type="button" id="help">Help and Trust &amp; Safety${CHEV}</button></div>
+   <div class="sec">Demo</div><div class="group"><button class="cellr redtxt" type="button" id="resetBtn">Reset Demo</button></div>
+   <div class="foot">Clears your swipes, saved workers, chats, hires and Premium, so the app starts like it's your first time.</div>
+   <div class="ver">Homely 1.0 · Class demo</div>`;
+  if($('upg')) $('upg').onclick=()=>paywall('upgrade');
+  $('notif').onclick=()=>{notif=!notif;$('notif').setAttribute('aria-checked',notif)};
+  $('privacy').onclick=()=>banner('Homely','Your ID and background data are only used for verification.');
+  $('help').onclick=()=>banner('Homely Trust & Safety','We reply to every report within 24 hours.');
+  $('resetBtn').onclick=()=>{
+    overlay(`<div class="asheet"><div class="agroup"><div class="ah">Reset the demo? Everything goes back to how it was the first time you opened the app.</div>
+     <button type="button" class="red" id="rsOk">Reset Demo</button></div><div class="agroup"><button type="button" class="bold" id="rsNo">Cancel</button></div></div>`);
+    $('rsOk').onclick=resetAll; $('rsNo').onclick=closeOv;
+  };
+}
+function resetAll(){
+  premium=false; used=0; seen=new Set(); hist=[]; undoTop=null; notif=true; filt={av:'All',areas:[],sk:[]};
+  for(const k in status) delete status[k];
+  for(const k in chats) delete chats[k];
+  unread.clear(); savedOrder=[]; gotCodes.clear(); chatId=null;
+  for(let i=W.length-1;i>=0;i--) if(W[i].fresh) W.splice(i,1);
+  ws=0; vdone=new Set(); vbusy=null; me={...ME0,sk:[...ME0.sk]}; delete me.id;
+  seed(); closeOv(); $('bannerHost').innerHTML=''; $('sChat').hidden=true; $('sWP').hidden=true;
+  setMode('hire'); updBadge(); renderDeck(); launch();
+}
+
+/* ---------- Launch screen ---------- */
+let lt;
+function launch(){
+  const old=$('launch'), L=old.cloneNode(true);
+  L.classList.remove('out'); L.hidden=false; old.replaceWith(L);
+  const hide=()=>{clearTimeout(lt);L.classList.add('out');setTimeout(()=>{L.hidden=true},500)};
+  L.onclick=hide; lt=setTimeout(hide,2300);
+}
+
+renderDeck(); updBadge(); launch();
 </script>
 </html>
