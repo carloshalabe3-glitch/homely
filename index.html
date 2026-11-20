@@ -17,11 +17,11 @@
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-html,body{height:100%}
+html,body{height:100%;overflow:hidden}
 html{touch-action:manipulation}
 body{margin:0;background:var(--brand);font-family:var(--font);color:var(--label);-webkit-font-smoothing:antialiased;
-  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:16px;
-  display:flex;flex-direction:column;align-items:center;gap:12px}
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:14px;
+  display:flex;flex-direction:column;align-items:center;gap:10px;box-sizing:border-box;height:100%;max-height:100dvh}
 button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--tan);outline-offset:2px}
 
@@ -40,8 +40,8 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .demo-note{color:var(--sand);opacity:.7;font-size:12px;text-align:center;max-width:410px}
 
 /* device */
-.device{width:100%;max-width:410px;height:min(860px, calc(100dvh - 150px));min-height:660px;background:#111;border-radius:58px;padding:11px;
-  box-shadow:0 0 0 2px #3a3a3c, 0 30px 70px rgba(0,0,0,.45);flex:none}
+.device{width:100%;max-width:410px;flex:1 1 auto;min-height:0;max-height:860px;background:#111;border-radius:58px;padding:11px;
+  box-shadow:0 0 0 2px #3a3a3c, 0 30px 70px rgba(0,0,0,.45)}
 .screen{position:relative;width:100%;height:100%;background:var(--bg);border-radius:47px;overflow:hidden;display:flex;flex-direction:column}
 .status{height:50px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:6px 30px 0 34px;font-weight:600;font-size:16px;position:relative;z-index:6}
 .status .icons{display:flex;gap:6px;align-items:center}
@@ -49,7 +49,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .island{position:absolute;top:11px;left:50%;transform:translateX(-50%);width:120px;height:35px;background:#000;border-radius:20px}
 .homebar{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#000;z-index:30;pointer-events:none}
 @media (max-width:440px){
-  .device{padding:0;background:none;box-shadow:none;border-radius:0;height:calc(100dvh - 130px);min-height:600px}
+  .device{padding:0;background:none;box-shadow:none;border-radius:0}
   .screen{border-radius:28px}
   .island,.homebar{display:none}
   .status{display:none}
@@ -250,6 +250,7 @@ button.cellr:active{background:#E5E5EA}
 .rate{display:flex;gap:5px;align-items:center;font-size:13.5px;color:var(--label2)}
 .rate .star{color:#C98A00;font-weight:600}
 @media (max-height:800px){.card .bio{display:none}}
+@media (max-height:640px){.card .checks{display:none}.lt h1{font-size:28px}.brandhead span{font-size:26px}.photo{min-height:64px}.card .avatar{width:76px;height:76px}.vbadge,.avail{top:8px}}
 /* launch screen */
 .launch{position:absolute;inset:0;z-index:60;background:var(--brand);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;transition:opacity .45s ease;cursor:pointer}
 .launch.out{opacity:0;pointer-events:none}
@@ -323,7 +324,6 @@ button.cellr:active{background:#E5E5EA}
 
 <div class="caption">
   <b><span class="appicon"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M5 15 16 6l11 9v11a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V15Z" fill="#1F4D3A"/><path d="m11 18 3.6 3.6L21 15" stroke="#EFE6D6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Homely</b>
-  <span id="hint">Swipe right to save a worker. Tap a card to see the full profile.</span>
 </div>
 <div class="mode" aria-label="Demo view">
   <button type="button" id="modeHire" aria-pressed="true">I'm hiring</button>
@@ -382,7 +382,6 @@ button.cellr:active{background:#E5E5EA}
   <div class="launch" id="launch"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path class="house" d="M5 15 16 6l11 9v11a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V15Z" fill="#EFE6D6"/><path class="tick" d="m11 18 3.6 3.6L21 15" stroke="#1F4D3A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="wm">Homely</div><div class="tg">Trusted help, one swipe away.</div></div>
  </div>
 </div>
-<div class="demo-note">Class demo for a business plan. All workers, brands and messages are fictional, and no payments are made.</div>
 
 <script>
 const $=id=>document.getElementById(id);
@@ -821,7 +820,6 @@ function setMode(m){
   const work=m==='work';
   $('modeHire').setAttribute('aria-pressed',!work); $('modeWork').setAttribute('aria-pressed',work);
   closeOv(); $('bannerHost').innerHTML='';
-  $('hint').textContent=work?'Sign up as a domestic worker and go through verification.':'Swipe right to save a worker. Tap a card to see the full profile.';
   $('sWP').hidden=true;
   if(work){ $('sChat').hidden=true; chatId=null; TABS.forEach(x=>$('s'+x).hidden=true); $('tabbar').hidden=true; $('sWorker').hidden=false; wrender(); }
   else { $('sWorker').hidden=true; $('tabbar').hidden=false; showTab('Discover'); }
