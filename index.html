@@ -403,7 +403,7 @@ const W=[
  {n:'Patricia',a:44,area:'Álvaro Obregón',y:14,av:'Entrada por salida',sk:['Cooking','Childcare','Cleaning'],ref:3,bio:'Former cook at a small restaurant. Plans the weekly menu and does the shopping. Great with teenagers.'},
  {n:'Silvia',a:56,area:'Iztapalapa',y:25,av:'Full-time',sk:['Cleaning','Cooking','Elder care'],ref:4,bio:'Twenty-five years in family homes in Polanco and Lomas. Can live in. Strong references from two families.'},
  {n:'Daniela',a:26,area:'Benito Juárez',y:4,av:'Part-time',sk:['Childcare','Cleaning','English basics'],ref:2,bio:'Studying early education at night. Picks kids up from school and helps with basic English homework.'}
-].map((w,i)=>({...w,id:i,tone:TONES[i%TONES.length],ini:initials(w.n),hair:[6,0,4,2,3,8,5,7,1,3][i],
+].map((w,i)=>({...w,id:i,tone:TONES[i%TONES.length],ini:initials(w.n),hair:[6,0,4,2,8,1,3,7,1,0][i],
   r:[4.9,4.8,5.0,4.7,4.9,4.8,4.6,4.9,5.0,4.7][i],rc:[31,18,46,9,27,15,12,22,58,6][i],km:[5.1,14.8,21.3,2.4,9.6,13.2,15.6,6.8,22.7,11.9][i]}));
 W[6].days=[0,0,0,0,0,1,1];
 const DAYS={'Full-time':[1,1,1,1,1,1,0],'Part-time':[1,0,1,0,1,0,0],'Entrada por salida':[1,1,1,1,1,0,0]};
@@ -492,7 +492,7 @@ function genWorker(f){
   const h=rint(7,9);
   const tail=av==='Full-time'?'Looking for a full-time position with one family.':av==='Part-time'?'Available a few days a week.':`Available entrada por salida from ${h} am to ${h-2} pm.`;
   const w={n,a,area,y,av,sk,ref:rint(2,4),bio:`${y} ${GBIO[sk[0]]} ${tail}`,id:genId++,gen:true,tone:pick(TONES),ini:initials(n),
-    hair:male?5:pick([0,1,2,3,4,6,7,8]),r:Math.round((4.5+Math.random()*.5)*10)/10,rc:rint(3,60),km:Math.round(((AREA_KM[area]||8)+Math.random()*3-1.5)*10)/10};
+    hair:male?3:pick([0,1,2,3,4,6,7,8]),r:Math.round((4.5+Math.random()*.5)*10)/10,rc:rint(3,60),km:Math.round(((AREA_KM[area]||8)+Math.random()*3-1.5)*10)/10};
   W.push(w); return w;
 }
 
@@ -887,7 +887,7 @@ function filterSheet(){
 /* ---------- Profile tab ---------- */
 function renderAccount(){
   const hires=Object.values(status).filter(x=>x==='hired').length;
-  $('acct').innerHTML=`<div class="group"><div class="me-card"><div class="av" style="background:#DCCFB0">${sil({hair:5})}</div><div class="ct"><b style="font-size:20px">Carlos H.</b><span>Employer account · Santa Fe, CDMX</span></div></div></div>
+  $('acct').innerHTML=`<div class="group"><div class="me-card"><div class="av" style="background:#DCCFB0">${sil({hair:3})}</div><div class="ct"><b style="font-size:20px">Carlos H.</b><span>Employer account · Santa Fe, CDMX</span></div></div></div>
    <div class="sec">Plan</div><div class="group"><div class="cellr">${premium?'Homely Premium':'Free plan'}<span class="val">${premium?'$'+PREMIUM+' MXN / month':FREE+' swipes a day'}</span></div>
     ${premium?'':`<button class="cellr" type="button" id="upg" style="color:var(--tint);font-weight:600">Upgrade to Premium${CHEV}</button>`}</div>
    <div class="sec">Activity</div><div class="group"><div class="cellr">Saved workers<span class="val">${savedOrder.length}</span></div><div class="cellr">Hires through Homely<span class="val">${hires}</span></div></div>
