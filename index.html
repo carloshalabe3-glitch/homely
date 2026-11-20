@@ -403,18 +403,21 @@ const W=[
  {n:'Patricia',a:44,area:'Álvaro Obregón',y:14,av:'Entrada por salida',sk:['Cooking','Childcare','Cleaning'],ref:3,bio:'Former cook at a small restaurant. Plans the weekly menu and does the shopping. Great with teenagers.'},
  {n:'Silvia',a:56,area:'Iztapalapa',y:25,av:'Full-time',sk:['Cleaning','Cooking','Elder care'],ref:4,bio:'Twenty-five years in family homes in Polanco and Lomas. Can live in. Strong references from two families.'},
  {n:'Daniela',a:26,area:'Benito Juárez',y:4,av:'Part-time',sk:['Childcare','Cleaning','English basics'],ref:2,bio:'Studying early education at night. Picks kids up from school and helps with basic English homework.'}
-].map((w,i)=>({...w,id:i,tone:TONES[i%TONES.length],ini:initials(w.n),hair:[1,0,4,2,3,0,5,2,1,3][i],
+].map((w,i)=>({...w,id:i,tone:TONES[i%TONES.length],ini:initials(w.n),hair:[6,0,4,2,3,8,5,7,1,3][i],
   r:[4.9,4.8,5.0,4.7,4.9,4.8,4.6,4.9,5.0,4.7][i],rc:[31,18,46,9,27,15,12,22,58,6][i],km:[5.1,14.8,21.3,2.4,9.6,13.2,15.6,6.8,22.7,11.9][i]}));
 W[6].days=[0,0,0,0,0,1,1];
 const DAYS={'Full-time':[1,1,1,1,1,1,0],'Part-time':[1,0,1,0,1,0,0],'Entrada por salida':[1,1,1,1,1,0,0]};
 const AREA_KM={'Álvaro Obregón':5.8,'Benito Juárez':12.1,'Coyoacán':13.5,'Cuajimalpa':2.9,'Iztapalapa':21.8,'Magdalena Contreras':9.9,'Miguel Hidalgo':8.4,'Tlalpan':15.1};
 const HAIR=[
  '<path d="M33 42C31 25 40 20 50 20s19 5 17 22l3 24c-6 3-12 1-15-3H45c-3 4-9 6-15 3Z"/>',
- '<circle cx="50" cy="23" r="7.5"/><path d="M34 38c0-10 7-15 16-15s16 5 16 15c-5-6-27-6-32 0Z"/>',
+ '<path d="M32 44c-3-17 6-24 18-24s21 7 18 24c2 5 4 9 3 14-1 5-5 8-9 7 1-4-1-7-3-9l-1-10H40l-1 10c-2 2-4 5-3 9-4 1-8-2-9-7-1-5 1-9 3-14Z"/>',
  '<path d="M34 38c0-10 7-15 16-15s16 5 16 15c-5-6-27-6-32 0Z"/><path d="M63 30c11 3 13 18 7 28-2-8-4-15-9-21Z"/>',
  '<circle cx="37" cy="31" r="8"/><circle cx="45" cy="25" r="8"/><circle cx="55" cy="25" r="8"/><circle cx="63" cy="31" r="8"/><circle cx="33" cy="41" r="6"/><circle cx="67" cy="41" r="6"/>',
  '<path d="M32 44c-2-16 6-23 18-23s20 7 18 23l-1 8c-3 1-6 0-7-2V38H40v12c-1 2-4 3-7 2Z"/>',
- '<path d="M34 38c0-11 7-16 16-16s16 5 16 16c-4-5-10-7-16-7s-12 2-16 7Z"/>'
+ '<path d="M34 38c0-11 7-16 16-16s16 5 16 16c-4-5-10-7-16-7s-12 2-16 7Z"/>',
+ '<path d="M34 38c0-10 7-15 16-15s16 5 16 15c-5-6-27-6-32 0Z"/><circle cx="63" cy="46" r="5.5"/><circle cx="65" cy="55" r="5.5"/><circle cx="66" cy="64" r="5"/><circle cx="66.5" cy="72" r="4.5"/>',
+ '<path d="M34 38c0-10 7-15 16-15s16 5 16 15c-5-6-27-6-32 0Z"/><path d="M58 25c6-9 19-8 22 2 2 7-1 15-6 20 0-7-2-13-6-17-3-2-6-4-10-5Z"/>',
+ '<path d="M33 46c-3-17 5-25 17-25 13 0 20 8 17 25l-1 10c-3 1-6 0-7-2V36c-7 0-14-2-18-7-1 4-3 8-3 13v12c-1 2-3 3-5 2Z"/>'
 ];
 function sil(w){return `<svg viewBox="0 0 100 100" aria-hidden="true"><g fill="#1F4D3A" opacity=".82">${HAIR[w.hair||0]}<circle cx="50" cy="40" r="16"/><rect x="44" y="52" width="12" height="14" rx="4"/><path d="M15 106C15 81 31 69 50 69S85 81 85 106Z"/></g></svg>`}
 function rateHTML(w,long){return (w.r?`<span class="star">★ ${w.r.toFixed(1)}</span><span>(${w.rc}${long?' reviews':''})</span>`:'<span class="star">★ New</span>')+(long?'':`<span>·</span><span>${w.km} km away</span>`)}
@@ -489,7 +492,7 @@ function genWorker(f){
   const h=rint(7,9);
   const tail=av==='Full-time'?'Looking for a full-time position with one family.':av==='Part-time'?'Available a few days a week.':`Available entrada por salida from ${h} am to ${h-2} pm.`;
   const w={n,a,area,y,av,sk,ref:rint(2,4),bio:`${y} ${GBIO[sk[0]]} ${tail}`,id:genId++,gen:true,tone:pick(TONES),ini:initials(n),
-    hair:male?5:rint(0,4),r:Math.round((4.5+Math.random()*.5)*10)/10,rc:rint(3,60),km:Math.round(((AREA_KM[area]||8)+Math.random()*3-1.5)*10)/10};
+    hair:male?5:pick([0,1,2,3,4,6,7,8]),r:Math.round((4.5+Math.random()*.5)*10)/10,rc:rint(3,60),km:Math.round(((AREA_KM[area]||8)+Math.random()*3-1.5)*10)/10};
   W.push(w); return w;
 }
 
